@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ToDo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page todo-plain bg-todo">
+
+  <header class="todo-topbar">
+    <a class="todo-back" href="hub.html">← 返回</a>
+
+    <div class="todo-actions">
+      <button class="pill pill--light" id="toggleHideDone" type="button">Hide Done: On</button>
+
+      <div class="seg" aria-label="todo list switcher">
+        <button class="seg__btn is-active" data-list="main" type="button">ToDo</button>
+        <button class="seg__btn" data-list="maybe" type="button">Maybe</button>
+        <button class="seg__btn" data-list="wish" type="button">Wish</button>
+      </div>
+
+      <div class="seg" aria-label="todo view switcher">
+        <button class="seg__btn is-active" data-todo-view="list" type="button">List</button>
+        <button class="seg__btn" data-todo-view="calendar" type="button">Calendar</button>
+      </div>
+
+      <button class="btn btn--small" id="addTodoBtn" type="button">+ Add</button>
+    </div>
+  </header>
+
+  <main class="wrap todo-wrap">
+
+    <!-- Section: Main To Do (with DDL) -->
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">ToDo</div>
+        <div class="todo-panel__sub">With DDL</div>
+      </div>
+
+      <div id="todoMainListView">
+        <div class="todo-table-head todo-table-head--actions">
+          <div class="todo-col todo-col--check">✓</div>
+          <div class="todo-col">Task</div>
+          <div class="todo-col todo-col--due">DDL</div>
+          <div class="todo-col todo-col--actions">Edit</div>
+        </div>
+
+        <div id="todoListMain" class="todo-list"></div>
+      </div>
+
+      <div id="todoMainCalendarView" class="todo-calendar-wrap hidden">
+        <div class="todo-calendar-toolbar">
+          <button class="mini-btn" id="todoPrevMonth" type="button">← Prev</button>
+          <div class="todo-calendar-month" id="todoCalendarMonthLabel">2026.03</div>
+          <button class="mini-btn" id="todoNextMonth" type="button">Next →</button>
+        </div>
+
+        <div class="todo-calendar-weekdays" aria-hidden="true">
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+          <div>Sun</div>
+        </div>
+
+        <div id="todoCalendarGrid" class="todo-calendar-grid"></div>
+      </div>
+    </section>
+
+    <!-- Section: Maybe (no DDL) -->
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">Maybe</div>
+        <div class="todo-panel__sub">No DDL</div>
+      </div>
+
+      <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
+        <div class="todo-col todo-col--check">✓</div>
+        <div class="todo-col">Task</div>
+        <div class="todo-col todo-col--actions">Edit</div>
+      </div>
+
+      <div id="todoListMaybe" class="todo-list todo-list--nodue"></div>
+    </section>
+
+    <!-- Section: Wish (no DDL) -->
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">Wish</div>
+        <div class="todo-panel__sub">No DDL</div>
+      </div>
+
+      <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
+        <div class="todo-col todo-col--check">✓</div>
+        <div class="todo-col">Item</div>
+        <div class="todo-col todo-col--actions">Edit</div>
+      </div>
+
+      <div id="todoListWish" class="todo-list todo-list--nodue"></div>
+    </section>
+
+    <!-- Composer -->
+    <section id="todoComposer" class="composer composer--new hidden" aria-label="Add a task">
+      <div class="composer__row">
+        <input id="todoText" class="input" type="text" placeholder="Type A Task…" maxlength="140">
+        <input id="todoDue" class="input input--due" type="date">
+      </div>
+
+      <div class="composer__row composer__row--actions">
+        <span class="composer__hint" id="composerHint">Adding To: To Do (With DDL)</span>
+        <div class="composer__btns">
+          <button id="todoSave" class="btn btn--small" type="button">Save</button>
+          <button id="todoCancel" class="btn btn--small btn--ghost" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Edit Dialog -->
+  <dialog id="todoEditDialog" class="dialog">
+    <form method="dialog" class="dialog__panel">
+      <h2 class="title" style="margin:0 0 10px;">Edit Task</h2>
+
+      <div style="display:grid; gap:10px;">
+        <input id="todoEditText" class="input" type="text" placeholder="Task…" maxlength="140">
+        <input id="todoEditDue" class="input" type="date">
+
+        <label style="display:flex; align-items:center; gap:10px; font-size:13px; color:rgba(15,17,21,.9);">
+          <input id="todoEditDone" type="checkbox" />
+          Mark as done
+        </label>
+
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div class="hint" id="todoEditHint" style="margin:0;">You can edit / delete anytime.</div>
+
+          <div style="display:flex; gap:10px;">
+            <button id="todoEditDeleteBtn" class="btn btn--ghost btn--small" value="cancel" type="button">Delete</button>
+            <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+            <button id="todoEditSaveBtn" class="btn btn--small" value="default" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    TodoPageV2.init();
+</script>
+</body>
+</html>

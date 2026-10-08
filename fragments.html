@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>碎片紀錄</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page bg-fragments">
+  <header class="todo-topbar">
+    <a class="todo-back" href="hub.html">← 返回</a>
+
+    <div class="todo-actions">
+      <select id="fragTagFilter" class="select">
+        <option value="all">全部標籤</option>
+      </select>
+
+      <button id="fragAddBtn" class="btn btn--small">＋ 新增</button>
+    </div>
+  </header>
+
+  <main class="wrap todo-wrap">
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">碎片紀錄</div>
+        <div class="todo-panel__sub">貼文 • 日期 • 標籤 • 編輯</div>
+      </div>
+
+      <div id="fragGrid" class="post-grid" style="padding:16px;"></div>
+    </section>
+  </main>
+
+  <!-- Add/Edit Dialog -->
+  <dialog id="fragDialog" class="dialog">
+    <form method="dialog" class="dialog__panel">
+      <h2 class="title" style="margin:0 0 10px;">編輯碎片</h2>
+
+      <div style="display:grid; gap:10px;">
+        <textarea id="fragText" class="textarea" rows="6" placeholder="Write anything..."></textarea>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <input id="fragDate" type="date" class="input" />
+          <input id="fragTag" class="input" placeholder="Tag (Optional)" />
+        </div>
+
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div class="hint" id="fragHint" style="margin:0;">YYYY.MM.DD</div>
+
+          <div style="display:flex; gap:10px;">
+            <button id="fragDeleteBtn" class="btn btn--ghost btn--small" value="cancel" type="button">Delete</button>
+            <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+            <button id="fragSaveBtn" class="btn btn--small" value="default" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    // init fragments page
+    if (window.FragmentsPage?.init) window.FragmentsPage.init();
+</script>
+</body>
+</html>

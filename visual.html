@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>視覺記憶</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page bg-visual">
+  <header class="todo-topbar">
+    <a class="todo-back" href="hub.html">← 返回</a>
+
+    <div class="todo-actions">
+      <select id="visAlbumFilter" class="select" aria-label="分類">
+        <option value="all">全部</option>
+        <option value="me">我的碎片</option>
+        <option value="life">生活碎片</option>
+      </select>
+      <button id="visAddBtn" class="btn btn--small" type="button">＋ 新增贴文</button>
+    </div>
+  </header>
+
+  <main class="wrap todo-wrap">
+    <section class="todo-panel visual-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">視覺記憶</div>
+        <div class="todo-panel__sub">照片 • 日期 • 文字 • 音乐</div>
+      </div>
+
+      <div id="visGrid" class="visual-post-grid"></div>
+    </section>
+  </main>
+
+  <dialog id="visDialog" class="dialog">
+    <form method="dialog" class="dialog__panel visual-editor">
+      <h2 id="visDialogTitle" class="title" style="margin:0 0 10px;">新增貼文</h2>
+
+      <div class="visual-editor__stack">
+        <label class="field">
+          <span class="field__label">照片</span>
+          <input id="visFile" class="input" type="file" accept="image/*" multiple />
+          <span id="visFileCount" class="hint" style="margin:0;">选择 1–9 张照片</span>
+        </label>
+
+        <div class="visual-photo-order-wrap">
+          <div class="field__label">照片顺序</div>
+          <div class="visual-photo-order__hint">拖动照片，或使用 ↑ ↓ 调整顺序。保存后顺序会作为这条贴文的一部分保留。</div>
+          <div id="visPhotoOrder" class="visual-photo-order"></div>
+        </div>
+
+        <div class="visual-editor__row">
+          <label class="field">
+            <span class="field__label">日期</span>
+            <input id="visDate" type="date" class="input" />
+          </label>
+
+          <label class="field">
+            <span class="field__label">分类</span>
+            <select id="visAlbum" class="select">
+              <option value="me">我的碎片</option>
+              <option value="life">生活碎片</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field__label">文字</span>
+          <textarea id="visCaption" class="textarea" rows="5" placeholder="写下这条贴文想留下的东西……"></textarea>
+        </label>
+
+        <label class="field">
+          <span class="field__label">音乐</span>
+          <input id="visMusic" class="input" type="url" placeholder="直接音频网址，例如 .mp3（可选）" />
+        </label>
+
+        <div class="hint visual-editor__hint">
+          一条贴文最多 9 张照片。照片会自动排成朋友圈式的小图；点开贴文后，可以一张一张浏览。
+          如果有音乐，打开贴文时会自动播放，关闭贴文时会停止。
+        </div>
+
+        <div class="dialog__actions">
+          <button id="visDeleteBtn" class="btn btn--ghost btn--small hidden" value="cancel" type="button">删除</button>
+          <button class="btn btn--ghost btn--small" value="cancel" type="submit">取消</button>
+          <button id="visSaveBtn" class="btn btn--small" value="default" type="button">保存贴文</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="visLightbox" class="dialog">
+    <form method="dialog" class="dialog__panel dialog__panel--lightbox visual-viewer">
+      <div class="visual-viewer__top">
+        <div>
+          <div class="lb__date" id="lbDate">YYYY.MM.DD</div>
+          <div class="visual-viewer__album" id="lbAlbum"></div>
+        </div>
+        <button class="btn btn--small btn--ghost" value="cancel" type="submit">关闭</button>
+      </div>
+
+      <div class="visual-viewer__counter" id="lbCount">1 / 1</div>
+
+      <div class="lb__media-stage">
+        <button id="lbPrevBtn" class="lb__nav lb__nav--prev" type="button" aria-label="上一张">←</button>
+        <div id="lbMedia" class="lb__single-media"></div>
+        <button id="lbNextBtn" class="lb__nav lb__nav--next" type="button" aria-label="下一张">→</button>
+      </div>
+
+      <div class="visual-viewer__bottom">
+        <div id="lbCaption" class="lb__cap"></div>
+
+        <div id="lbMusicBox" class="lb__music hidden">
+          <audio id="lbAudio" controls class="lb__audio"></audio>
+        </div>
+
+        <div class="lb__actions">
+          <button id="lbEditBtn" class="btn btn--small" type="button">编辑</button>
+          <button id="lbDeleteBtn" class="btn btn--small btn--ghost" type="button">删除</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    if (window.VisualPage?.init) window.VisualPage.init();
+  </script>
+</body>
+</html>

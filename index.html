@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page bg-home">
+  <main class="center">
+    <section class="frame frame--hero">
+      <h1 class="lyric" id="lyricText">“如果痛的都是必要的意外 我感受下坠享受失重感”</h1>
+
+      <div class="row">
+        <a class="btn" href="hub.html">ENTER</a>
+        <button class="btn btn--ghost" id="editLyricBtn" type="button">EDIT LINE</button>
+      </div>
+
+      <section class="home-inbox">
+        <div class="home-inbox__head">
+          <div>
+            <div class="home-inbox__title">臨時碎片</div>
+            <div class="home-inbox__sub">先丢进来，之后再整理。</div>
+          </div>
+          <button class="btn btn--small" id="homeInboxAddBtn" type="button">＋</button>
+        </div>
+        <a class="home-inbox__link" href="inbox.html">整理臨時碎片 →</a>
+      </section>
+
+      <dialog id="homeInboxDialog" class="dialog">
+        <form method="dialog" class="dialog__panel">
+          <h2 class="title" style="margin:0 0 10px;">臨時碎片</h2>
+          <textarea id="homeInboxText" class="textarea" rows="7" maxlength="3000"
+            placeholder="想到什么就先写什么……之后再整理。"></textarea>
+          <div class="dialog__actions">
+            <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+            <button id="homeInboxSave" class="btn btn--small" value="default" type="button">Save</button>
+          </div>
+        </form>
+      </dialog>
+
+      <p class="hint">Tip: This is stored only in your browser.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    // lyric quick edit (local-only)
+    const key = "site:lyric";
+    const el = document.getElementById("lyricText");
+    const saved = localStorage.getItem(key);
+    if (saved) el.textContent = saved;
+
+    document.getElementById("homeInboxAddBtn")?.addEventListener("click", () => document.getElementById("homeInboxDialog")?.showModal());
+
+    document.getElementById("editLyricBtn").addEventListener("click", () => {
+      const current = el.textContent.replaceAll("“","").replaceAll("”","");
+      const next = prompt("写一句你想放在首页的歌词/句子：", current);
+      if (next && next.trim()) {
+        const wrapped = `“${next.trim()}”`;
+        el.textContent = wrapped;
+        localStorage.setItem(key, wrapped);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.InboxPage?.initHome) window.InboxPage.initHome();
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>文字記錄</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page bg-writing">
+  <header class="todo-topbar">
+    <a class="todo-back" href="hub.html">← 返回</a>
+
+    <div class="todo-actions">
+      <input id="writingSearch" class="input input--search" placeholder="Search title / text / tag…" />
+
+      <select id="writingTagFilter" class="select">
+        <option value="all">All Tags</option>
+      </select>
+
+      <div class="seg" aria-label="view mode">
+        <button class="seg__btn is-active" data-view="timeline" type="button">Timeline</button>
+        <button class="seg__btn" data-view="list" type="button">List</button>
+      </div>
+
+      <button id="writingAddBtn" class="btn btn--small" type="button">+ Add</button>
+    </div>
+  </header>
+
+  <main class="wrap todo-wrap">
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">文字記錄</div>
+        <div class="todo-panel__sub">標題 • 日期 • 標籤 • 搜尋 • 編輯</div>
+      </div>
+
+      <div id="writingGrid" class="writing-grid" style="padding:16px;"></div>
+    </section>
+  </main>
+
+  <!-- Add/Edit Dialog -->
+  <dialog id="writingDialog" class="dialog">
+    <form method="dialog" class="dialog__panel">
+      <h2 class="title" style="margin:0 0 10px;">Edit</h2>
+
+      <div style="display:grid; gap:10px;">
+        <input id="writingTitle" class="input" placeholder="Title (Required)" maxlength="120" />
+        <textarea id="writingText" class="textarea" rows="10" placeholder="Write anything..." maxlength="12000"></textarea>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <input id="writingDate" type="date" class="input" />
+          <input id="writingTag" class="input" placeholder="Tags (Optional, comma-separated)" maxlength="120" />
+        </div>
+
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div class="hint" id="writingStats" style="margin:0;">Chars: 0 • Words: 0</div>
+
+          <div style="display:flex; gap:10px;">
+            <button id="writingDeleteBtn" class="btn btn--ghost btn--small" value="cancel" type="button">Delete</button>
+            <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+            <button id="writingSaveBtn" class="btn btn--small" value="default" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    if (window.WritingPage?.init) window.WritingPage.init();
+</script>
+</body>
+</html>

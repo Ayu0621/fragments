@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>靈感</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page bg-hub">
+  <header class="topbar">
+    <a class="topbar__brand" href="hub.html">← 返回</a>
+    <div class="topbar__right">
+      <select class="select" id="tagFilter" aria-label="filter by tag">
+        <option value="all">全部標籤</option>
+      </select>
+      <button class="pill pill--accent" id="addInspoBtn" type="button">＋ 新增</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="frame frame--wide">
+      <h2 class="title">靈感</h2>
+      <p class="sub">隨手記下的想法 • 標籤 • 心情</p>
+    </section>
+
+    <section id="inspoGrid" class="sticky-grid"></section>
+  </main>
+
+  <dialog id="inspoDialog" class="dialog">
+    <form method="dialog" class="dialog__panel">
+      <div class="dialog__title">new note</div>
+      <textarea id="inspoText" class="textarea" placeholder="write anything…" rows="6" maxlength="1200"></textarea>
+
+      <div class="dialog__row">
+        <input id="inspoTag" class="input" type="text" placeholder="tag (e.g.碎碎念 / 同人灵感)" maxlength="30">
+        <select id="inspoMood" class="select">
+          <option value="">mood (optional)</option>
+          <option value="calm">calm</option>
+          <option value="blue">blue</option>
+          <option value="hyper">hyper</option>
+          <option value="soft">soft</option>
+          <option value="angry">angry</option>
+        </select>
+      </div>
+
+      <div class="dialog__actions">
+        <button class="btn btn--small" id="inspoSave" value="default">save</button>
+        <button class="btn btn--small btn--ghost" value="cancel">cancel</button>
+      </div>
+      <p class="hint">saved locally in your browser.</p>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    InspoPage.init();
+</script>
+</body>
+</html>

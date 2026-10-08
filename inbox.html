@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>臨時碎片</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page bg-fragments">
+  <header class="todo-topbar">
+    <a class="todo-back" href="hub.html">← 返回</a>
+    <div class="todo-actions">
+      <span class="inbox-count" id="inboxCount">0 items</span>
+      <button id="inboxAddBtn" class="btn btn--small" type="button">＋ Add</button>
+    </div>
+  </header>
+
+  <main class="wrap todo-wrap">
+    <section class="todo-panel">
+      <div class="todo-panel__head">
+        <div class="todo-panel__title">臨時碎片</div>
+        <div class="todo-panel__sub">先收集 • 之后整理成 To Do / 碎片紀錄 / 靈感</div>
+      </div>
+      <div id="inboxGrid" class="inbox-grid" style="padding:16px;"></div>
+    </section>
+  </main>
+
+  <dialog id="inboxOrganizeDialog" class="dialog">
+    <form method="dialog" class="dialog__panel">
+      <h2 class="title" style="margin:0 0 10px;">整理臨時碎片</h2>
+
+      <div style="display:grid; gap:12px;">
+        <select id="inboxTargetType" class="select">
+          <option value="todo">待辦事項</option>
+          <option value="fragment">碎片紀錄</option>
+          <option value="inspo">靈感</option>
+        </select>
+
+        <div id="inboxTodoFields" class="inbox-form-fields">
+          <input id="inboxDue" type="date" class="input" />
+          <div class="hint" style="margin:0;">To Do 需要 DDL。</div>
+        </div>
+
+        <div id="inboxFragmentFields" class="inbox-form-fields hidden">
+          <input id="inboxDate" type="date" class="input" />
+          <input id="inboxFragmentTag" class="input" placeholder="Tag (Optional)" maxlength="30" />
+        </div>
+
+        <div id="inboxInspoFields" class="inbox-form-fields hidden">
+          <input id="inboxInspoTag" class="input" placeholder="Tag (Optional)" maxlength="30" />
+          <select id="inboxMood" class="select">
+            <option value="">mood (optional)</option>
+            <option value="calm">calm</option>
+            <option value="blue">blue</option>
+            <option value="hyper">hyper</option>
+            <option value="soft">soft</option>
+            <option value="angry">angry</option>
+          </select>
+        </div>
+
+        <div class="dialog__actions">
+          <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+          <button id="inboxOrganizeSave" class="btn btn--small" value="default" type="button">整理并移入</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    if (window.InboxPage?.init) window.InboxPage.init();
+  </script>
+</body>
+</html>
