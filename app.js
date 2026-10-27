@@ -392,6 +392,8 @@ const TodoPageV2 = (() => {
   }
 
   function renderCalendar() {
+    // Mobile layout always uses one week; desktop may still use the two-week range.
+    if (isMobileLayout()) mobileShowTwoWeeks = false;
     ensureCalendarCursor();
     const grid = document.getElementById("todoCalendarGrid");
     const label = document.getElementById("todoCalendarMonthLabel");

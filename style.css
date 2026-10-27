@@ -3188,3 +3188,110 @@ body{
     overflow: visible;
   }
 }
+
+
+/* =========================================================
+   Fragments v5.3 — mobile ToDo workspace layout
+   Mobile: one-week calendar stacked above the full ToDo list.
+   Maybe and Wish remain below the ToDo list.
+   ========================================================= */
+@media (max-width: 760px) {
+  /* The mobile layout shows Calendar and List together, in document order. */
+  .todo-mobile-view-toggle {
+    display: none !important;
+  }
+
+  .todo-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .todo-workspace[data-mobile-view="calendar"] .todo-list-panel,
+  .todo-workspace[data-mobile-view="list"] .todo-calendar-panel {
+    display: block !important;
+  }
+
+  .todo-workspace > .todo-calendar-panel,
+  .todo-workspace > .todo-list-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* A compact, single-week calendar; the list follows directly beneath it. */
+  .todo-calendar-grid--workspace {
+    grid-auto-rows: minmax(62px, auto);
+    gap: 3px;
+  }
+
+  .todo-calendar-grid--workspace.is-two-weeks {
+    grid-template-rows: none;
+  }
+
+  .todo-calendar-grid--workspace .todo-calendar-day {
+    min-height: 62px;
+    padding: 5px 3px;
+    gap: 2px;
+  }
+
+  .todo-calendar-day__number {
+    font-size: 14px;
+  }
+
+  .todo-calendar-day__number.is-today-number {
+    width: 21px;
+    height: 21px;
+  }
+
+  .todo-calendar-grid--workspace .todo-calendar-items,
+  .todo-calendar-more {
+    display: none !important;
+  }
+
+  .todo-calendar-toolbar--workspace {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 6px;
+  }
+
+  .todo-week-nav .mini-btn {
+    min-height: 32px;
+    padding: 6px;
+  }
+
+  /* Hide the two-week control on mobile: mobile calendar is always one week. */
+  .todo-span-toggle {
+    display: none !important;
+  }
+
+  .todo-calendar-weekdays--workspace > div {
+    text-align: center;
+    font-size: 9px;
+  }
+
+  .todo-selected-day-panel {
+    margin-top: 9px;
+    padding-top: 9px;
+  }
+
+  .todo-workspace > .todo-list-panel {
+    margin-top: 0;
+  }
+
+  .todo-list-panel .todo-table-head--actions,
+  .todo-list-panel .todo-row--actions {
+    grid-template-columns: 25px minmax(0, 1fr) 58px 72px;
+    gap: 4px;
+    padding: 9px 7px;
+  }
+
+  .todo-list-panel .todo-row__actions .mini-btn {
+    padding: 5px 3px;
+    font-size: 8px;
+  }
+
+  .todo-secondary-lists {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
