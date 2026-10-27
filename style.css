@@ -2097,3 +2097,1094 @@ body{
     width:82%;
   }
 }
+
+
+/* =========================================================
+   ToDo UI/UX Redesign v1.0 — scoped to todo.html only
+   ========================================================= */
+.todo-topbar--workspace {
+  padding: 13px clamp(14px, 2vw, 28px);
+  gap: 16px;
+}
+.todo-actions--workspace {
+  gap: 9px;
+  justify-content: flex-end;
+}
+.todo-category-switch .seg__btn,
+.todo-mobile-view-toggle .seg__btn {
+  min-height: 36px;
+  padding: 8px 12px;
+}
+.todo-mobile-view-toggle,
+.todo-span-toggle,
+.weekday-short {
+  display: none;
+}
+.todo-add-button {
+  white-space: nowrap;
+}
+.todo-wrap--workspace {
+  width: min(1500px, 96vw);
+  padding-top: 12px;
+  padding-bottom: 56px;
+}
+.todo-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(14px, 1.6vw, 24px);
+}
+.todo-workspace > .todo-panel {
+  min-width: 0;
+  margin: 10px 0 18px;
+}
+.todo-workspace .todo-panel__head {
+  min-height: 66px;
+  align-items: center;
+  gap: 12px;
+}
+.todo-workspace .todo-panel__title {
+  font-size: 21px;
+}
+.todo-workspace .todo-panel__sub {
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-align: right;
+}
+.todo-calendar-wrap--workspace {
+  padding: 13px;
+}
+.todo-calendar-toolbar--workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 12px;
+  margin-bottom: 12px;
+}
+.todo-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.todo-week-nav .mini-btn {
+  min-height: 33px;
+  padding: 7px 8px;
+  white-space: nowrap;
+}
+.todo-calendar-month {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  font-size: 17px;
+  line-height: 1.25;
+  text-align: center;
+  align-self: center;
+  pointer-events: none;
+}
+.todo-week-nav {
+  grid-column: 1 / 2;
+  grid-row: 2;
+}
+.todo-today-button {
+  display: inline-flex;
+}
+.todo-span-toggle {
+  grid-column: 2 / 3;
+  grid-row: 2;
+  justify-self: end;
+}
+.todo-calendar-weekdays--workspace {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0 0 7px;
+}
+.todo-calendar-weekdays--workspace > div {
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.todo-calendar-grid--workspace {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(132px, auto);
+  gap: 7px;
+}
+.todo-calendar-grid--workspace.is-two-weeks {
+  grid-template-rows: repeat(2, minmax(132px, auto));
+}
+.todo-calendar-grid--workspace .todo-calendar-day {
+  position: relative;
+  min-width: 0;
+  min-height: 132px;
+  height: auto;
+  overflow: hidden;
+  padding: 8px 7px 7px;
+  gap: 6px;
+  border: 1px solid rgba(0,0,0,.11);
+  background: rgba(255,255,255,.77);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.todo-calendar-grid--workspace .todo-calendar-day:hover {
+  background: rgba(255,255,255,.98);
+  border-color: rgba(0,0,0,.3);
+}
+.todo-calendar-grid--workspace .todo-calendar-day.is-today {
+  border-color: rgba(15,17,21,.78);
+  box-shadow: inset 0 0 0 1px rgba(15,17,21,.18);
+}
+.todo-calendar-grid--workspace .todo-calendar-day.is-selected {
+  background: rgba(255,255,255,.99);
+  box-shadow: inset 0 0 0 2px rgba(15,17,21,.62);
+}
+.todo-calendar-day__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+  min-width: 0;
+  line-height: 1;
+}
+.todo-calendar-day__weekday {
+  display: none;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.48);
+}
+.todo-calendar-day__number {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.05;
+  color: rgba(15,17,21,.92);
+}
+.todo-calendar-day__number.is-today-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  color: white;
+  background: #111;
+}
+.todo-day-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(0,0,0,.15);
+  background: rgba(255,255,255,.83);
+  color: #111;
+  border-radius: 50%;
+  font: 400 16px/1 var(--font-ui);
+  cursor: pointer;
+  opacity: .68;
+}
+.todo-day-add:hover,
+.todo-day-add:focus-visible {
+  opacity: 1;
+  border-color: rgba(0,0,0,.5);
+}
+.todo-calendar-day__count {
+  min-height: 10px;
+  font-size: 9px;
+  line-height: 1.1;
+  color: rgba(0,0,0,.42);
+}
+.todo-calendar-items {
+  min-width: 0;
+  gap: 4px;
+}
+.todo-calendar-grid--workspace .todo-calendar-item {
+  min-width: 0;
+  padding: 5px 6px;
+  border-color: rgba(0,0,0,.09);
+  background: rgba(255,255,255,.94);
+  font-size: 10px;
+  line-height: 1.28;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+.todo-calendar-grid--workspace .todo-calendar-item.is-overdue {
+  border-left: 2px solid #b42318;
+}
+.todo-calendar-more {
+  width: 100%;
+  border: 0;
+  padding: 1px 0 0;
+  text-align: left;
+  background: transparent;
+  color: rgba(0,0,0,.58);
+  font: 500 10px/1.3 var(--font-ui);
+  cursor: pointer;
+}
+.todo-calendar-more:hover {
+  color: #111;
+  text-decoration: underline;
+}
+.todo-selected-day-panel {
+  display: none;
+}
+.todo-main-list-view {
+  min-width: 0;
+}
+.todo-list-panel .todo-table-head--actions,
+.todo-list-panel .todo-row--actions {
+  grid-template-columns: 24px minmax(0, 1fr) 82px 98px;
+  gap: 7px;
+  padding: 10px 11px;
+}
+.todo-list-panel .todo-table-head--actions {
+  font-size: 10px;
+  letter-spacing: .07em;
+}
+.todo-list-panel .todo-row--actions .todo-due {
+  padding-right: 0;
+  font-size: 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.todo-list-panel .todo-row__actions {
+  gap: 4px;
+}
+.todo-list-panel .todo-row__actions .mini-btn {
+  padding: 5px 6px;
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+.todo-list-panel .todo-check {
+  width: 16px;
+  height: 16px;
+}
+.todo-text-button {
+  min-width: 0;
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.todo-text-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.todo-text-button.is-done,
+.todo-row.is-done .todo-text {
+  text-decoration: line-through;
+  opacity: .55;
+}
+.todo-empty-state {
+  padding: 16px;
+}
+.todo-secondary-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 1.6vw, 24px);
+  align-items: start;
+}
+.todo-secondary-panel {
+  min-width: 0;
+  margin: 0 0 18px;
+}
+.todo-secondary-panel .todo-panel__head {
+  min-height: 58px;
+}
+.todo-secondary-panel .todo-panel__title {
+  font-size: 20px;
+}
+.todo-secondary-panel .todo-table-head--actions,
+.todo-secondary-panel .todo-row--actions {
+  grid-template-columns: 24px minmax(0, 1fr) 98px;
+  gap: 7px;
+  padding: 10px 12px;
+}
+.todo-secondary-panel .todo-row__actions {
+  gap: 4px;
+}
+.todo-secondary-panel .todo-row__actions .mini-btn {
+  padding: 5px 6px;
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+.todo-secondary-panel .todo-check {
+  width: 16px;
+  height: 16px;
+}
+
+/* Create/edit dialogs use the same neutral visual language as existing panels. */
+.todo-dialog-panel {
+  width: min(520px, calc(100vw - 28px));
+  max-width: 100%;
+  display: grid;
+  gap: 15px;
+  padding: 22px;
+}
+.todo-dialog-heading .title,
+.todo-edit-title {
+  margin: 0 0 4px;
+}
+.todo-dialog-heading .sub {
+  font-size: 12px;
+}
+.todo-dialog-field {
+  display: grid;
+  gap: 7px;
+  color: rgba(15,17,21,.84);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+.todo-dialog-field .input {
+  min-height: 43px;
+}
+.todo-optional-label {
+  color: rgba(0,0,0,.46);
+  letter-spacing: 0;
+}
+.todo-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+.todo-dialog-actions--edit {
+  justify-content: flex-start;
+}
+.todo-dialog-actions__spacer {
+  flex: 1 1 auto;
+}
+.todo-delete-button {
+  color: #9e2525;
+}
+.todo-done-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(15,17,21,.9);
+  font-size: 13px;
+}
+.todo-done-field input {
+  width: 17px;
+  height: 17px;
+}
+.todo-enter-hint,
+#todoEditHint {
+  margin: -5px 0 0;
+}
+.todo-day-dialog__tasks {
+  display: grid;
+  gap: 7px;
+  max-height: min(50vh, 420px);
+  overflow-y: auto;
+}
+.todo-day-dialog-item {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid rgba(0,0,0,.1);
+  background: rgba(255,255,255,.92);
+  text-align: left;
+  color: #111;
+  font: 13px/1.4 var(--font-ui);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.todo-day-dialog-item:hover {
+  border-color: rgba(0,0,0,.35);
+}
+.todo-day-dialog-item.is-done {
+  opacity: .55;
+  text-decoration: line-through;
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .todo-wrap--workspace {
+    width: min(980px, 94vw);
+  }
+  .todo-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .todo-calendar-grid--workspace .todo-calendar-day {
+    min-height: 126px;
+  }
+}
+
+@media (max-width: 760px) {
+  .todo-plain .todo-actions--workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "hide add" "lists lists" "views views";
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+  .todo-topbar--workspace {
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px 12px;
+  }
+  .todo-topbar--workspace .todo-back {
+    padding: 5px 0;
+    font-size: 12px;
+  }
+  .todo-actions--workspace {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .todo-category-switch {
+    order: 3;
+    flex: 1 1 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .todo-category-switch .seg__btn {
+    min-width: 0;
+    padding: 8px 5px;
+    font-size: 11px;
+  }
+  .todo-actions--workspace > #toggleHideDone {
+    order: 1;
+    min-height: 34px;
+    padding: 7px 8px;
+    font-size: 10px;
+    letter-spacing: .04em;
+  }
+  .todo-add-button {
+    order: 2;
+    min-height: 36px;
+    padding: 8px 13px;
+    font-size: 10px;
+  }
+  .todo-mobile-view-toggle {
+    order: 4;
+    display: grid;
+    flex: 1 1 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .todo-mobile-view-toggle .seg__btn {
+    min-height: 36px;
+  }
+  .todo-wrap--workspace {
+    width: 100%;
+    padding: 8px 10px 34px;
+  }
+  .todo-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .todo-workspace > .todo-panel {
+    margin: 8px 0 14px;
+  }
+  .todo-workspace[data-mobile-view="calendar"] .todo-list-panel {
+    display: none;
+  }
+  .todo-workspace[data-mobile-view="list"] .todo-calendar-panel {
+    display: none;
+  }
+  .todo-workspace .todo-panel__head {
+    min-height: 58px;
+    padding: 12px 13px;
+  }
+  .todo-workspace .todo-panel__title {
+    font-size: 20px;
+  }
+  .todo-workspace .todo-panel__sub {
+    max-width: 54%;
+    font-size: 9px;
+    line-height: 1.35;
+  }
+  .todo-calendar-wrap--workspace {
+    padding: 11px 9px 12px;
+  }
+  .todo-calendar-toolbar--workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 9px 7px;
+    margin-bottom: 10px;
+  }
+  .todo-calendar-month {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    font-size: 15px;
+    padding: 0 2px;
+  }
+  .todo-week-nav {
+    grid-column: 1 / 2;
+    grid-row: 2;
+    gap: 4px;
+  }
+  .todo-week-nav .mini-btn {
+    min-height: 34px;
+    padding: 7px 7px;
+    font-size: 9px;
+    letter-spacing: .03em;
+  }
+  .todo-today-button {
+    display: inline-flex;
+  }
+  .todo-span-toggle {
+    display: inline-flex;
+    grid-column: 2 / 3;
+    grid-row: 2;
+    align-self: center;
+    min-height: 34px;
+    padding: 7px 8px;
+    font-size: 9px;
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+  .todo-calendar-weekdays--workspace {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
+    margin-bottom: 5px;
+  }
+  .todo-calendar-weekdays--workspace > div {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  .todo-calendar-weekdays--workspace .weekday-full {
+    display: none;
+  }
+  .todo-calendar-weekdays--workspace .weekday-short {
+    display: inline;
+  }
+  .todo-calendar-grid--workspace {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: minmax(86px, auto);
+    gap: 3px;
+  }
+  .todo-calendar-grid--workspace.is-two-weeks {
+    grid-template-rows: repeat(2, minmax(86px, auto));
+  }
+  .todo-calendar-grid--workspace .todo-calendar-day {
+    min-height: 86px;
+    height: auto;
+    padding: 5px 4px 4px;
+    gap: 4px;
+    background: rgba(255,255,255,.84);
+    border-radius: 0;
+  }
+  .todo-calendar-day__head {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .todo-calendar-day__weekday {
+    display: none;
+  }
+  .todo-calendar-day__number {
+    font-size: 15px;
+  }
+  .todo-calendar-day__number.is-today-number {
+    width: 23px;
+    height: 23px;
+  }
+  .todo-day-add {
+    width: 18px;
+    height: 18px;
+    font-size: 13px;
+    opacity: .82;
+  }
+  .todo-calendar-day__count {
+    min-height: 13px;
+    margin-top: 2px;
+    font-size: 8px;
+    line-height: 1.2;
+    color: rgba(0,0,0,.58);
+    overflow-wrap: anywhere;
+  }
+  .todo-calendar-grid--workspace .todo-calendar-items {
+    display: none;
+  }
+  .todo-calendar-more {
+    display: none;
+  }
+  .todo-calendar-grid--workspace .todo-calendar-day.is-selected {
+    background: white;
+    box-shadow: inset 0 0 0 2px rgba(15,17,21,.7);
+  }
+  .todo-selected-day-panel {
+    display: block;
+    margin-top: 13px;
+    border-top: 1px solid rgba(0,0,0,.1);
+    padding-top: 13px;
+  }
+  .todo-selected-day__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .todo-selected-day__eyebrow {
+    margin-bottom: 3px;
+    color: rgba(0,0,0,.44);
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .todo-selected-day__title {
+    margin: 0;
+    font: 600 18px/1.25 var(--font-display);
+    color: #111;
+  }
+  .todo-selected-day__head .btn {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 9px;
+    letter-spacing: .04em;
+  }
+  .todo-selected-day__tasks {
+    display: grid;
+    gap: 0;
+  }
+  .todo-selected-task {
+    display: grid;
+    grid-template-columns: 23px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 11px 2px;
+    border-bottom: 1px solid rgba(0,0,0,.07);
+  }
+  .todo-selected-task:last-child {
+    border-bottom: 0;
+  }
+  .todo-selected-task__text {
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    color: #111;
+    background: transparent;
+    font: 13px/1.4 var(--font-ui);
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .todo-selected-task__text.is-done {
+    text-decoration: line-through;
+    opacity: .55;
+  }
+  .todo-selected-day-empty {
+    padding: 12px 2px;
+    color: rgba(0,0,0,.48);
+    font-size: 12px;
+  }
+  .todo-list-panel .todo-table-head--actions,
+  .todo-list-panel .todo-row--actions {
+    grid-template-columns: 25px minmax(0, 1fr) 74px 88px;
+    gap: 6px;
+    padding: 10px 9px;
+  }
+  .todo-list-panel .todo-table-head--actions {
+    font-size: 9px;
+  }
+  .todo-list-panel .todo-row--actions .todo-due {
+    font-size: 9px;
+    line-height: 1.3;
+  }
+  .todo-list-panel .todo-row__actions .mini-btn {
+    padding: 6px 5px;
+    font-size: 8px;
+  }
+  .todo-list-panel .todo-text-button {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .todo-secondary-lists {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .todo-secondary-panel {
+    margin: 0 0 14px;
+  }
+  .todo-secondary-panel .todo-panel__head {
+    min-height: 54px;
+    padding: 11px 13px;
+  }
+  .todo-secondary-panel .todo-table-head--actions,
+  .todo-secondary-panel .todo-row--actions {
+    grid-template-columns: 25px minmax(0, 1fr) 88px;
+    gap: 6px;
+    padding: 10px 9px;
+  }
+  .todo-secondary-panel .todo-row__actions .mini-btn {
+    padding: 6px 5px;
+    font-size: 8px;
+  }
+  .todo-dialog-panel {
+    width: calc(100vw - 28px);
+    padding: 18px 15px;
+    gap: 13px;
+  }
+  .todo-dialog-actions .btn {
+    min-height: 38px;
+  }
+  .todo-dialog-actions--edit {
+    gap: 6px;
+  }
+  .todo-dialog-actions--edit .btn {
+    padding: 8px 8px;
+    font-size: 9px;
+    letter-spacing: .04em;
+  }
+  .todo-day-dialog__tasks {
+    max-height: 45vh;
+  }
+}
+
+@media (max-width: 390px) {
+  .todo-wrap--workspace {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .todo-calendar-wrap--workspace {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .todo-calendar-grid--workspace .todo-calendar-day {
+    min-height: 80px;
+    padding: 4px 3px;
+  }
+  .todo-calendar-day__number {
+    font-size: 14px;
+  }
+  .todo-day-add {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+  .todo-calendar-day__count {
+    font-size: 7px;
+  }
+  .todo-list-panel .todo-table-head--actions,
+  .todo-list-panel .todo-row--actions {
+    grid-template-columns: 22px minmax(0, 1fr) 65px 78px;
+    gap: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .todo-list-panel .todo-row__actions .mini-btn {
+    padding: 5px 3px;
+    font-size: 7px;
+  }
+  .todo-secondary-panel .todo-table-head--actions,
+  .todo-secondary-panel .todo-row--actions {
+    grid-template-columns: 22px minmax(0, 1fr) 78px;
+    gap: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .todo-secondary-panel .todo-row__actions .mini-btn {
+    padding: 5px 3px;
+    font-size: 7px;
+  }
+}
+
+
+/* ToDo workspace polish v1.1 — one unified section, calmer hierarchy */
+.todo-main-panel {
+  margin: 10px 0 22px;
+  overflow: hidden;
+  border: 1px solid rgba(15,17,21,.16);
+  box-shadow: 0 8px 28px rgba(0,0,0,.13);
+  background: rgba(255,255,255,.97);
+}
+.todo-main-panel__head {
+  min-height: 72px;
+  padding: 17px 21px;
+  background: #171717;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.todo-main-panel__head .todo-panel__title {
+  color: #fff;
+  font-size: clamp(23px, 2vw, 29px);
+  letter-spacing: -.015em;
+}
+.todo-main-panel__head .todo-panel__sub {
+  max-width: none;
+  color: rgba(255,255,255,.72);
+  font-size: 11px;
+  letter-spacing: .055em;
+}
+.todo-main-panel > .todo-workspace {
+  gap: 0;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  align-items: stretch;
+  background: rgba(255,255,255,.97);
+}
+.todo-main-panel .todo-workspace > .todo-panel {
+  margin: 0;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.todo-main-panel .todo-calendar-panel {
+  border-right: 1px solid rgba(15,17,21,.12) !important;
+}
+.todo-main-panel .todo-calendar-wrap--workspace {
+  padding: 19px 17px 18px;
+}
+.todo-main-panel .todo-calendar-toolbar--workspace {
+  align-items: center;
+  gap: 10px;
+}
+.todo-main-panel .todo-week-nav {
+  gap: 6px;
+}
+.todo-main-panel .mini-btn {
+  border-radius: 5px;
+  border-color: rgba(15,17,21,.16);
+  background: #fff;
+  transition: background .15s ease, border-color .15s ease;
+}
+.todo-main-panel .mini-btn:hover {
+  background: #f2f2f2;
+  border-color: rgba(15,17,21,.32);
+}
+.todo-main-panel .todo-calendar-month {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .015em;
+}
+.todo-main-panel .todo-calendar-weekdays--workspace {
+  margin-top: 13px;
+  margin-bottom: 7px;
+}
+.todo-main-panel .todo-calendar-weekdays--workspace > div {
+  color: #777b83;
+  font-size: 9px;
+  letter-spacing: .075em;
+}
+.todo-main-panel .todo-calendar-grid--workspace {
+  gap: 6px;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-day {
+  border: 1px solid #e5e6e9;
+  border-radius: 7px;
+  background: #fbfbfc;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-day:hover {
+  border-color: #aeb2ba;
+  background: #fff;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-day.is-today {
+  border: 1.5px solid #282828;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.035);
+  background: #fff;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-day.is-selected {
+  border-color: #555b66;
+  background: #f1f2f4;
+}
+.todo-main-panel .todo-calendar-day__number {
+  font-weight: 600;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-item {
+  border-radius: 4px;
+  background: #eceef1;
+  color: #292c32;
+  border-left: 2px solid #858b95;
+  line-height: 1.3;
+}
+.todo-main-panel .todo-calendar-grid--workspace .todo-calendar-item.is-overdue {
+  background: #f8eaea;
+  border-left-color: #b75b5b;
+  color: #7f3030;
+}
+.todo-main-panel .todo-list-panel {
+  border-left: 0 !important;
+}
+.todo-main-panel .todo-main-list-view {
+  padding: 19px 17px;
+}
+.todo-main-panel .todo-table-head--actions {
+  border-bottom: 1px solid #e5e6e9;
+  background: #f7f7f8;
+  border-radius: 5px 5px 0 0;
+}
+.todo-main-panel .todo-row--actions {
+  min-height: 52px;
+  border-bottom-color: #ececef;
+}
+.todo-main-panel .todo-row--actions:hover {
+  background: #fafafa;
+}
+.todo-main-panel .todo-selected-day-panel {
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid #e7e8eb;
+  border-radius: 7px;
+  background: #fafafa;
+}
+.todo-main-panel .todo-selected-day__eyebrow {
+  letter-spacing: .09em;
+}
+.todo-secondary-lists {
+  gap: 18px;
+}
+.todo-secondary-panel {
+  border: 1px solid rgba(15,17,21,.14);
+  box-shadow: 0 5px 20px rgba(0,0,0,.09);
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .todo-main-panel > .todo-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .todo-main-panel .todo-calendar-panel {
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(15,17,21,.12) !important;
+  }
+}
+@media (max-width: 760px) {
+  .todo-main-panel {
+    margin: 6px 0 16px;
+    border-radius: 7px;
+  }
+  .todo-main-panel__head {
+    min-height: 62px;
+    padding: 13px 15px;
+  }
+  .todo-main-panel__head .todo-panel__title {
+    font-size: 22px;
+  }
+  .todo-main-panel__head .todo-panel__sub {
+    max-width: none;
+    font-size: 10px;
+  }
+  .todo-main-panel .todo-workspace > .todo-panel {
+    border-radius: 0;
+  }
+  .todo-main-panel .todo-calendar-panel {
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(15,17,21,.12) !important;
+  }
+  .todo-main-panel .todo-calendar-wrap--workspace {
+    padding: 12px 10px 13px;
+  }
+  .todo-main-panel .todo-main-list-view {
+    padding: 12px 10px;
+  }
+  .todo-main-panel .todo-calendar-grid--workspace {
+    gap: 4px;
+  }
+  .todo-secondary-lists {
+    gap: 12px;
+  }
+}
+
+/* ToDo v1.2 — keep the desktop task list aligned with the two-week calendar.
+   Extra tasks scroll inside the list instead of stretching the whole page. */
+@media (min-width: 1101px) {
+  .todo-main-panel > .todo-workspace {
+    height: 455px;
+    min-height: 455px;
+    align-items: stretch;
+  }
+
+  .todo-main-panel .todo-calendar-panel,
+  .todo-main-panel .todo-list-panel {
+    height: 455px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .todo-main-panel .todo-calendar-wrap--workspace {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+  }
+
+  .todo-main-panel .todo-calendar-grid--workspace.is-two-weeks {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .todo-main-panel .todo-calendar-grid--workspace:not(.is-two-weeks) {
+    grid-auto-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .todo-main-panel .todo-calendar-grid--workspace .todo-calendar-day {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .todo-main-panel .todo-main-list-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .todo-main-panel .todo-table-head--actions {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .todo-main-panel #todoListMain {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-right: 2px;
+  }
+
+  .todo-main-panel #todoListMain .todo-row--actions {
+    min-height: 52px;
+  }
+}
+
+/* Tablet layouts stack the panels, so let them use natural height. */
+@media (max-width: 1100px) {
+  .todo-main-panel > .todo-workspace {
+    height: auto;
+    min-height: 0;
+  }
+
+  .todo-main-panel .todo-calendar-panel,
+  .todo-main-panel .todo-list-panel {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .todo-main-panel .todo-main-list-view {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .todo-main-panel #todoListMain {
+    overflow: visible;
+  }
+}

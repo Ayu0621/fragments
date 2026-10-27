@@ -23,82 +23,114 @@ function clampText(s, max = 1200) {
 }
 
 /* =========================
-   To-do Page V2 (3 lists)
-   - main requires DDL
-   - maybe / wish no DDL
-   - add + edit + delete
+   To-do Page V3 — Two-week planning workspace
+   - shared ToDo data for Calendar + List
+   - Maybe / Wish retain independent lists
+   - DDL remains optional; calendar-created tasks inherit the clicked date
    ========================= */
 const TodoPageV2 = (() => {
-  const KEY = "site:todos:v2";
-  const VIEW_KEY = "site:todo:view:v1";
-  const MONTH_KEY = "site:todo:calendarMonth:v1";
+  const KEY = "site:todos:v2"; // Keep the existing task storage key.
+  const HIDE_DONE_KEY = "site:todoHideDone:v2";
+  const MOBILE_VIEW_KEY = "site:todo:mobileView:v1";
+  const WEEK_KEY = "site:todo:calendarWeekStart:v1";
 
   let hideDone = true;
-  let activeList = "main"; // main | maybe | wish
-  let activeView = "list"; // list | calendar
-  let calendarCursor = null; // first day of visible month
-
-  // edit state
+  let activeList = "main"; // main | maybe | wish; used by the + ADD composer
+  let activeView = "calendar"; // mobile preference only; desktop shows both panes
+  let calendarCursor = null; // Monday of the visible first week
+  let selectedDate = "";
+  let mobileShowTwoWeeks = false;
   let editingListId = null;
   let editingId = null;
+  let dayDialogDate = "";
 
   function read() {
-    return Store.get(KEY, { main: [], maybe: [], wish: [] });
+    const stored = Store.get(KEY, { main: [], maybe: [], wish: [] });
+    const value = stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {};
+    return {
+      ...value,
+      main: Array.isArray(value.main) ? value.main : [],
+      maybe: Array.isArray(value.maybe) ? value.maybe : [],
+      wish: Array.isArray(value.wish) ? value.wish : []
+    };
   }
+
   function write(data) {
     Store.set(KEY, data);
   }
 
   function todayISO() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    return isoFromDate(new Date());
+  }
+
+  function isoFromDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
   }
 
   function parseISOToLocal(iso) {
-    if (!iso) return null;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return null;
     const [y, m, d] = iso.split("-").map(Number);
-    if (!y || !m || !d) return null;
-    return new Date(y, m - 1, d);
+    const date = new Date(y, m - 1, d);
+    return Number.isNaN(date.getTime()) ? null : date;
   }
 
-  function monthStamp(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    return `${y}-${m}`;
+  function addDays(date, amount) {
+    const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    next.setDate(next.getDate() + amount);
+    return next;
   }
 
-  function formatMonthLabel(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    return `${y}.${m}`;
+  function mondayOf(date) {
+    const base = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const daysSinceMonday = (base.getDay() + 6) % 7;
+    base.setDate(base.getDate() - daysSinceMonday);
+    return base;
+  }
+
+  function isMobileLayout() {
+    return window.matchMedia ? window.matchMedia("(max-width: 760px)").matches : window.innerWidth <= 760;
   }
 
   function formatDueLabel(iso) {
-    if (!iso) return "";
+    if (!iso) return "No DDL";
     const [y, m, d] = iso.split("-");
     return `${y}.${m}.${d}`;
   }
 
+  function formatDayLabel(iso, includeWeekday = true) {
+    const date = parseISOToLocal(iso);
+    if (!date) return iso || "";
+    return new Intl.DateTimeFormat("en-GB", includeWeekday
+      ? { weekday: "short", day: "numeric", month: "short", year: "numeric" }
+      : { day: "numeric", month: "short", year: "numeric" }
+    ).format(date);
+  }
+
+  function formatRangeLabel(start, end) {
+    const sameYear = start.getFullYear() === end.getFullYear();
+    const startText = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" })
+    }).format(start);
+    const endText = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric", month: "short", year: "numeric"
+    }).format(end);
+    return `${startText} – ${endText}`;
+  }
+
   function ensureCalendarCursor() {
     if (calendarCursor instanceof Date && !Number.isNaN(calendarCursor.getTime())) return;
-
-    const saved = Store.get(MONTH_KEY, "");
-    if (saved && /^\d{4}-\d{2}$/.test(saved)) {
-      const [y, m] = saved.split("-").map(Number);
-      calendarCursor = new Date(y, m - 1, 1);
-      return;
-    }
-
-    const now = new Date();
-    calendarCursor = new Date(now.getFullYear(), now.getMonth(), 1);
+    const saved = Store.get(WEEK_KEY, "");
+    const savedDate = parseISOToLocal(saved);
+    calendarCursor = mondayOf(savedDate || new Date());
+    Store.set(WEEK_KEY, isoFromDate(calendarCursor));
   }
 
   function persistCalendarCursor() {
     ensureCalendarCursor();
-    Store.set(MONTH_KEY, monthStamp(calendarCursor));
+    Store.set(WEEK_KEY, isoFromDate(calendarCursor));
   }
 
   function sortMain(list) {
@@ -124,34 +156,73 @@ const TodoPageV2 = (() => {
     };
   }
 
+  function getVisibleDates() {
+    ensureCalendarCursor();
+    const mobileOneWeek = isMobileLayout() && !mobileShowTwoWeeks;
+    const length = mobileOneWeek ? 7 : 14;
+    return Array.from({ length }, (_, i) => addDays(calendarCursor, i));
+  }
+
+  function dateIsInVisibleRange(iso) {
+    return getVisibleDates().some(date => isoFromDate(date) === iso);
+  }
+
+  function moveCalendarToDate(iso) {
+    const date = parseISOToLocal(iso);
+    if (!date) return;
+    if (!dateIsInVisibleRange(iso)) {
+      calendarCursor = mondayOf(date);
+      persistCalendarCursor();
+    }
+  }
+
+  function getTasksForDate(iso) {
+    let tasks = sortMain(read().main).filter(item => item.due === iso);
+    if (hideDone) tasks = tasks.filter(item => !item.done);
+    return tasks;
+  }
+
+  function setActiveList(next) {
+    activeList = ["main", "maybe", "wish"].includes(next) ? next : "main";
+    document.querySelectorAll(".seg__btn[data-list]").forEach(btn => {
+      btn.classList.toggle("is-active", btn.dataset.list === activeList);
+      btn.setAttribute("aria-pressed", btn.dataset.list === activeList ? "true" : "false");
+    });
+
+    const dueField = document.getElementById("todoDueField");
+    const dueEl = document.getElementById("todoDue");
+    const hint = document.getElementById("composerHint");
+    if (dueField) dueField.classList.toggle("hidden", activeList !== "main");
+    if (dueEl && activeList !== "main") dueEl.value = "";
+    if (hint) {
+      hint.textContent = activeList === "main"
+        ? "ToDo · DDL is optional"
+        : activeList === "maybe" ? "Maybe · No date required" : "Wish · No date required";
+    }
+  }
+
   function openEditDialog(listId, item) {
     const dialog = document.getElementById("todoEditDialog");
     const textEl = document.getElementById("todoEditText");
     const dueEl = document.getElementById("todoEditDue");
+    const dueField = document.getElementById("todoEditDueField");
     const doneEl = document.getElementById("todoEditDone");
-
     if (!dialog || !textEl || !dueEl || !doneEl) return;
 
     editingListId = listId;
     editingId = item.id;
-
     textEl.value = item.text || "";
     doneEl.checked = !!item.done;
-
-    if (listId === "main") {
-      dueEl.classList.remove("hidden");
-      dueEl.value = item.due || "";
-    } else {
-      dueEl.classList.add("hidden");
-      dueEl.value = "";
-    }
+    if (dueField) dueField.classList.toggle("hidden", listId !== "main");
+    dueEl.value = listId === "main" ? (item.due || "") : "";
 
     dialog.showModal();
     textEl.focus();
   }
 
   function closeEditDialog() {
-    document.getElementById("todoEditDialog")?.close();
+    const dialog = document.getElementById("todoEditDialog");
+    if (dialog?.open) dialog.close();
     editingListId = null;
     editingId = null;
   }
@@ -160,218 +231,294 @@ const TodoPageV2 = (() => {
     const textEl = document.getElementById("todoEditText");
     const dueEl = document.getElementById("todoEditDue");
     const doneEl = document.getElementById("todoEditDone");
-
     const text = (textEl?.value || "").trim();
     const due = dueEl?.value || "";
     const done = !!doneEl?.checked;
-
-    if (!editingListId || !editingId) return;
-    if (!text) return;
-
-    if (editingListId === "main" && !due) {
-      alert("DDL Is Required For To Do.");
+    if (!editingListId || !editingId || !text) {
+      if (!text) textEl?.focus();
       return;
     }
 
     const data = read();
-    const idx = (data[editingListId] || []).findIndex(x => x.id === editingId);
-    if (idx >= 0) {
-      data[editingListId][idx] = {
-        ...data[editingListId][idx],
-        text,
-        due: (editingListId === "main") ? due : "",
-        done,
-        updatedAt: Date.now()
-      };
-      write(data);
-      renderAll();
-      closeEditDialog();
+    const idx = (data[editingListId] || []).findIndex(item => item.id === editingId);
+    if (idx < 0) return;
+    data[editingListId][idx] = {
+      ...data[editingListId][idx],
+      text,
+      due: editingListId === "main" ? due : "",
+      done,
+      updatedAt: Date.now()
+    };
+    write(data);
+
+    if (editingListId === "main" && due) {
+      moveCalendarToDate(due);
+      selectedDate = due;
     }
+    closeEditDialog();
+    renderAll();
+  }
+
+  function deleteTask(listId, id) {
+    const ok = confirm("Delete This Task?");
+    if (!ok) return;
+    const data = read();
+    data[listId] = (data[listId] || []).filter(item => item.id !== id);
+    write(data);
+    closeDayDialog();
+    renderAll();
   }
 
   function deleteEdit() {
     if (!editingListId || !editingId) return;
+    const listId = editingListId;
+    const id = editingId;
     const ok = confirm("Delete This Task?");
     if (!ok) return;
-
     const data = read();
-    data[editingListId] = (data[editingListId] || []).filter(x => x.id !== editingId);
+    data[listId] = (data[listId] || []).filter(item => item.id !== id);
+    write(data);
+    closeEditDialog();
+    closeDayDialog();
+    renderAll();
+  }
+
+  function toggleTaskDone(listId, id, isDone) {
+    const data = read();
+    const item = (data[listId] || []).find(entry => entry.id === id);
+    if (!item) return;
+    item.done = !!isDone;
+    item.updatedAt = Date.now();
     write(data);
     renderAll();
-    closeEditDialog();
   }
 
   function renderList(listId, containerId, withDue) {
-    const data = read();
     const container = document.getElementById(containerId);
     if (!container) return;
-
-    let list = data[listId] || [];
-    list = (listId === "main") ? sortMain(list) : sortSimple(list);
-
-    if (hideDone) list = list.filter(x => !x.done);
-
+    let list = listId === "main" ? sortMain(read().main) : sortSimple(read()[listId]);
+    if (hideDone) list = list.filter(item => !item.done);
     container.innerHTML = "";
 
-    if (list.length === 0) {
+    if (!list.length) {
       const empty = document.createElement("div");
-      empty.className = "hint";
-      empty.style.padding = "12px 16px";
-      empty.textContent = hideDone
-        ? "No Open Tasks. (Done Items Are Hidden)"
-        : "No Tasks Yet.";
+      empty.className = "hint todo-empty-state";
+      empty.textContent = hideDone ? "No open tasks. (Done items are hidden)" : "No tasks yet.";
       container.appendChild(empty);
       return;
     }
 
-    for (const t of list) {
+    for (const task of list) {
       const row = document.createElement("div");
       row.className = withDue ? "todo-row todo-row--actions" : "todo-row todo-row--nodue todo-row--actions";
+      if (task.done) row.classList.add("is-done");
 
-      const c = document.createElement("input");
-      c.type = "checkbox";
-      c.className = "todo-check";
-      c.checked = !!t.done;
-      c.addEventListener("change", () => {
-        const all = read();
-        const idx = (all[listId] || []).findIndex(x => x.id === t.id);
-        if (idx >= 0) {
-          all[listId][idx].done = c.checked;
-          all[listId][idx].updatedAt = Date.now();
-          write(all);
-          renderAll();
-        }
-      });
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "todo-check";
+      checkbox.checked = !!task.done;
+      checkbox.setAttribute("aria-label", `Mark ${task.text} as ${task.done ? "not done" : "done"}`);
+      checkbox.addEventListener("change", () => toggleTaskDone(listId, task.id, checkbox.checked));
 
-      const text = document.createElement("div");
-      text.className = "todo-text";
-      text.textContent = t.text;
-
-      if (withDue && t.due) {
-        const state = getDayState(t);
+      const text = document.createElement("button");
+      text.type = "button";
+      text.className = "todo-text todo-text-button";
+      text.textContent = task.text;
+      text.title = "Click to edit";
+      if (task.done) text.classList.add("is-done");
+      if (withDue && task.due) {
+        const state = getDayState(task);
         if (state.isOverdue) text.classList.add("todo-text--overdue");
         else if (state.isTodayDue) text.classList.add("todo-text--today");
       }
-      text.title = "Click to edit";
-      text.style.cursor = "pointer";
-      text.addEventListener("click", () => openEditDialog(listId, t));
-
-      row.appendChild(c);
-      row.appendChild(text);
+      text.addEventListener("click", () => openEditDialog(listId, task));
+      row.append(checkbox, text);
 
       if (withDue) {
         const due = document.createElement("div");
         due.className = "todo-due";
-        due.textContent = t.due || "";
-        const state = getDayState(t);
-        if (state.isOverdue) due.classList.add("todo-due--overdue");
-        else if (state.isTodayDue) due.classList.add("todo-due--today");
+        due.textContent = formatDueLabel(task.due || "");
+        if (task.due) {
+          const state = getDayState(task);
+          if (state.isOverdue) due.classList.add("todo-due--overdue");
+          else if (state.isTodayDue) due.classList.add("todo-due--today");
+        }
         row.appendChild(due);
       }
 
       const actions = document.createElement("div");
       actions.className = "todo-row__actions";
-
       const editBtn = document.createElement("button");
       editBtn.type = "button";
       editBtn.className = "mini-btn";
       editBtn.textContent = "Edit";
-      editBtn.addEventListener("click", () => openEditDialog(listId, t));
-
+      editBtn.addEventListener("click", () => openEditDialog(listId, task));
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.className = "mini-btn mini-btn--danger";
       delBtn.textContent = "Delete";
-      delBtn.addEventListener("click", () => {
-        const ok = confirm("Delete This Task?");
-        if (!ok) return;
-        const all = read();
-        all[listId] = (all[listId] || []).filter(x => x.id !== t.id);
-        write(all);
-        renderAll();
-      });
-
-      actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
+      delBtn.addEventListener("click", () => deleteTask(listId, task.id));
+      actions.append(editBtn, delBtn);
       row.appendChild(actions);
       container.appendChild(row);
     }
   }
 
+  function handleCalendarDateClick(iso) {
+    if (isMobileLayout()) {
+      selectedDate = iso;
+      renderCalendar();
+      renderSelectedDay();
+    } else {
+      openComposer(iso, "main");
+    }
+  }
+
+  function createCalendarTaskButton(task, iso) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "todo-calendar-item";
+    const state = getDayState(task);
+    if (state.isOverdue) button.classList.add("is-overdue");
+    else if (state.isTodayDue) button.classList.add("is-today-due");
+    if (task.done) button.classList.add("is-done");
+    button.textContent = task.text;
+    button.title = `${task.text} · ${formatDueLabel(iso)}`;
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      openEditDialog("main", task);
+    });
+    return button;
+  }
+
   function renderCalendar() {
     ensureCalendarCursor();
-
     const grid = document.getElementById("todoCalendarGrid");
     const label = document.getElementById("todoCalendarMonthLabel");
+    const spanButton = document.getElementById("todoToggleCalendarSpan");
     if (!grid || !label) return;
 
-    label.textContent = formatMonthLabel(calendarCursor);
+    const dates = getVisibleDates();
+    if (!dates.some(date => isoFromDate(date) === selectedDate)) selectedDate = isoFromDate(dates[0]);
+    label.textContent = formatRangeLabel(dates[0], dates[dates.length - 1]);
+    grid.classList.toggle("is-two-weeks", dates.length === 14);
+    grid.setAttribute("aria-label", `Calendar from ${isoFromDate(dates[0])} to ${isoFromDate(dates[dates.length - 1])}`);
+    if (spanButton) spanButton.textContent = mobileShowTwoWeeks ? "Show 1 Week" : "Show 2 Weeks";
     grid.innerHTML = "";
 
-    const all = sortMain(read().main || []);
-    const monthTasks = all.filter(x => x.due && monthStamp(parseISOToLocal(x.due) || new Date(0)) === monthStamp(calendarCursor));
-
-    const byDay = new Map();
-    for (const item of monthTasks) {
-      if (hideDone && item.done) continue;
-      const day = Number((item.due || "").split("-")[2] || 0);
-      if (!day) continue;
-      if (!byDay.has(day)) byDay.set(day, []);
-      byDay.get(day).push(item);
-    }
-
-    const first = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), 1);
-    const daysInMonth = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 0).getDate();
-    const firstWeekday = (first.getDay() + 6) % 7; // Mon=0
-    const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
-
-    for (let i = 0; i < totalCells; i++) {
+    const allTasks = sortMain(read().main || []);
+    for (const date of dates) {
+      const iso = isoFromDate(date);
       const cell = document.createElement("div");
       cell.className = "todo-calendar-day";
-
-      const dayNum = i - firstWeekday + 1;
-      if (dayNum < 1 || dayNum > daysInMonth) {
-        cell.classList.add("is-outside");
-        grid.appendChild(cell);
-        continue;
-      }
-
-      const iso = `${calendarCursor.getFullYear()}-${String(calendarCursor.getMonth() + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+      cell.dataset.date = iso;
+      cell.tabIndex = 0;
+      cell.setAttribute("role", "button");
+      cell.setAttribute("aria-label", `${formatDayLabel(iso)}. Click to ${isMobileLayout() ? "select the day" : "add a task"}.`);
       if (iso === todayISO()) cell.classList.add("is-today");
+      if (iso === selectedDate) cell.classList.add("is-selected");
 
       const head = document.createElement("div");
       head.className = "todo-calendar-day__head";
-      head.textContent = String(dayNum);
+      const weekday = document.createElement("span");
+      weekday.className = "todo-calendar-day__weekday";
+      weekday.textContent = new Intl.DateTimeFormat("en-GB", { weekday: "short" }).format(date);
+      const number = document.createElement("span");
+      number.className = "todo-calendar-day__number";
+      number.textContent = String(date.getDate());
+      if (iso === todayISO()) number.classList.add("is-today-number");
+      head.append(weekday, number);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "todo-day-add";
+      addBtn.textContent = "+";
+      addBtn.setAttribute("aria-label", `Add ToDo for ${formatDayLabel(iso)}`);
+      addBtn.title = "Add a ToDo on this date";
+      addBtn.addEventListener("click", event => {
+        event.stopPropagation();
+        openComposer(iso, "main");
+      });
+      head.appendChild(addBtn);
       cell.appendChild(head);
 
-      const tasks = byDay.get(dayNum) || [];
-      if (tasks.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "todo-calendar-empty";
-        empty.textContent = "";
-        cell.appendChild(empty);
-      } else {
-        const list = document.createElement("div");
-        list.className = "todo-calendar-items";
+      let dayTasks = allTasks.filter(task => task.due === iso);
+      if (hideDone) dayTasks = dayTasks.filter(task => !task.done);
+      const count = document.createElement("div");
+      count.className = "todo-calendar-day__count";
+      count.textContent = dayTasks.length ? `${dayTasks.length} ${dayTasks.length === 1 ? "task" : "tasks"}` : "";
+      count.setAttribute("aria-hidden", "true");
+      cell.appendChild(count);
 
-        for (const task of tasks) {
-          const item = document.createElement("button");
-          item.type = "button";
-          item.className = "todo-calendar-item";
-          const state = getDayState(task);
-          if (state.isOverdue) item.classList.add("is-overdue");
-          else if (state.isTodayDue) item.classList.add("is-today-due");
-          if (task.done) item.classList.add("is-done");
-          item.textContent = task.text;
-          item.title = `${task.text} · ${formatDueLabel(task.due)}`;
-          item.addEventListener("click", () => openEditDialog("main", task));
-          list.appendChild(item);
-        }
+      const list = document.createElement("div");
+      list.className = "todo-calendar-items";
+      dayTasks.slice(0, 2).forEach(task => list.appendChild(createCalendarTaskButton(task, iso)));
+      cell.appendChild(list);
 
-        cell.appendChild(list);
+      if (dayTasks.length > 2) {
+        const more = document.createElement("button");
+        more.type = "button";
+        more.className = "todo-calendar-more";
+        more.textContent = `+${dayTasks.length - 2} more`;
+        more.addEventListener("click", event => {
+          event.stopPropagation();
+          if (isMobileLayout()) {
+            selectedDate = iso;
+            renderCalendar();
+            renderSelectedDay();
+          } else {
+            openDayDialog(iso);
+          }
+        });
+        cell.appendChild(more);
       }
 
+      cell.addEventListener("click", () => handleCalendarDateClick(iso));
+      cell.addEventListener("keydown", event => {
+        if (event.target !== cell) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleCalendarDateClick(iso);
+        }
+      });
       grid.appendChild(cell);
+    }
+  }
+
+  function renderSelectedDay() {
+    const panel = document.getElementById("todoSelectedDayPanel");
+    const title = document.getElementById("todoSelectedDayTitle");
+    const tasksEl = document.getElementById("todoSelectedDayTasks");
+    const addBtn = document.getElementById("todoSelectedDayAdd");
+    if (!panel || !title || !tasksEl) return;
+    title.textContent = formatDayLabel(selectedDate);
+    if (addBtn) addBtn.onclick = () => openComposer(selectedDate, "main");
+    tasksEl.innerHTML = "";
+    const tasks = getTasksForDate(selectedDate);
+    if (!tasks.length) {
+      const empty = document.createElement("div");
+      empty.className = "todo-selected-day-empty";
+      empty.textContent = hideDone ? "No open ToDos on this day." : "No ToDos on this day.";
+      tasksEl.appendChild(empty);
+      return;
+    }
+    for (const task of tasks) {
+      const row = document.createElement("div");
+      row.className = "todo-selected-task";
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = !!task.done;
+      check.className = "todo-check";
+      check.setAttribute("aria-label", `Mark ${task.text} as done`);
+      check.addEventListener("change", () => toggleTaskDone("main", task.id, check.checked));
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "todo-selected-task__text";
+      open.textContent = task.text;
+      if (task.done) open.classList.add("is-done");
+      open.addEventListener("click", () => openEditDialog("main", task));
+      row.append(check, open);
+      tasksEl.appendChild(row);
     }
   }
 
@@ -380,61 +527,55 @@ const TodoPageV2 = (() => {
     renderList("maybe", "todoListMaybe", false);
     renderList("wish", "todoListWish", false);
     renderCalendar();
-  }
-
-  function setActiveList(next) {
-    activeList = next;
-
-    document.querySelectorAll(".seg__btn[data-list]").forEach(btn => {
-      btn.classList.toggle("is-active", btn.dataset.list === next);
-    });
-
-    const due = document.getElementById("todoDue");
-    const hint = document.getElementById("composerHint");
-    if (!due || !hint) return;
-
-    if (next === "main") {
-      due.classList.remove("hidden");
-      hint.textContent = "Adding To: To Do (DDL Required)";
-    } else if (next === "maybe") {
-      due.classList.add("hidden");
-      hint.textContent = "Adding To: Maybe (No DDL)";
-    } else {
-      due.classList.add("hidden");
-      hint.textContent = "Adding To: Wish (No DDL)";
-    }
+    renderSelectedDay();
   }
 
   function setView(next) {
-    activeView = (next === "calendar") ? "calendar" : "list";
-    Store.set(VIEW_KEY, activeView);
-
+    activeView = next === "list" ? "list" : "calendar";
+    Store.set(MOBILE_VIEW_KEY, activeView);
+    const workspace = document.getElementById("todoWorkspace");
+    if (workspace) workspace.dataset.mobileView = activeView;
     document.querySelectorAll(".seg__btn[data-todo-view]").forEach(btn => {
-      btn.classList.toggle("is-active", btn.dataset.todoView === activeView);
+      const isActive = btn.dataset.todoView === activeView;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-
-    const listView = document.getElementById("todoMainListView");
-    const calendarView = document.getElementById("todoMainCalendarView");
-    if (listView) listView.classList.toggle("hidden", activeView !== "list");
-    if (calendarView) calendarView.classList.toggle("hidden", activeView !== "calendar");
   }
 
-  function shiftMonth(delta) {
+  function shiftWeeks(delta) {
     ensureCalendarCursor();
-    calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+    const days = isMobileLayout() && !mobileShowTwoWeeks ? 7 : 14;
+    calendarCursor = addDays(calendarCursor, delta * days);
+    selectedDate = isoFromDate(calendarCursor);
     persistCalendarCursor();
-    renderCalendar();
+    renderAll();
   }
 
-  function openComposer() {
-    const box = document.getElementById("todoComposer");
-    if (!box) return;
-    box.classList.remove("hidden");
-    document.getElementById("todoText")?.focus();
+  function goToCurrentWeek() {
+    calendarCursor = mondayOf(new Date());
+    selectedDate = todayISO();
+    persistCalendarCursor();
+    renderAll();
+  }
+
+  function openComposer(dueOverride = "", category = null) {
+    if (category) setActiveList(category);
+    const dialog = document.getElementById("todoCreateDialog");
+    const textEl = document.getElementById("todoText");
+    const dueEl = document.getElementById("todoDue");
+    const titleEl = document.getElementById("todoCreateTitle");
+    if (!dialog || !textEl || !dueEl) return;
+    if (titleEl) titleEl.textContent = activeList === "main" ? "Add ToDo" : activeList === "maybe" ? "Add Maybe" : "Add Wish";
+    textEl.value = "";
+    dueEl.value = activeList === "main" ? (dueOverride || "") : "";
+    setActiveList(activeList);
+    if (!dialog.open) dialog.showModal();
+    requestAnimationFrame(() => textEl.focus());
   }
 
   function closeComposer() {
-    document.getElementById("todoComposer")?.classList.add("hidden");
+    const dialog = document.getElementById("todoCreateDialog");
+    if (dialog?.open) dialog.close();
     const text = document.getElementById("todoText");
     const due = document.getElementById("todoDue");
     if (text) text.value = "";
@@ -444,14 +585,10 @@ const TodoPageV2 = (() => {
   function addTask() {
     const textEl = document.getElementById("todoText");
     const dueEl = document.getElementById("todoDue");
-
     const text = (textEl?.value || "").trim();
-    const due = dueEl?.value || "";
-
-    if (!text) return;
-
-    if (activeList === "main" && !due) {
-      alert("DDL Is Required For To Do.");
+    const due = activeList === "main" ? (dueEl?.value || "") : "";
+    if (!text) {
+      textEl?.focus();
       return;
     }
 
@@ -460,42 +597,74 @@ const TodoPageV2 = (() => {
     data[activeList].push({
       id: Store.uid(),
       text,
-      due: activeList === "main" ? due : "",
+      due,
       done: false,
       createdAt: Date.now(),
       updatedAt: Date.now()
     });
-
     write(data);
 
     if (activeList === "main" && due) {
-      const dueDate = parseISOToLocal(due);
-      if (dueDate) {
-        calendarCursor = new Date(dueDate.getFullYear(), dueDate.getMonth(), 1);
-        persistCalendarCursor();
-      }
+      moveCalendarToDate(due);
+      selectedDate = due;
     }
-
     closeComposer();
     renderAll();
   }
 
+  function openDayDialog(iso) {
+    const dialog = document.getElementById("todoDayDialog");
+    const title = document.getElementById("todoDayDialogTitle");
+    const list = document.getElementById("todoDayDialogTasks");
+    if (!dialog || !title || !list) return;
+    dayDialogDate = iso;
+    title.textContent = formatDayLabel(iso);
+    list.innerHTML = "";
+    const tasks = getTasksForDate(iso);
+    if (!tasks.length) {
+      const empty = document.createElement("div");
+      empty.className = "todo-selected-day-empty";
+      empty.textContent = hideDone ? "No open ToDos on this day." : "No ToDos on this day.";
+      list.appendChild(empty);
+    } else {
+      tasks.forEach(task => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "todo-day-dialog-item";
+        button.textContent = `${task.done ? "✓  " : ""}${task.text}`;
+        if (task.done) button.classList.add("is-done");
+        button.addEventListener("click", () => {
+          closeDayDialog();
+          openEditDialog("main", task);
+        });
+        list.appendChild(button);
+      });
+    }
+    dialog.showModal();
+  }
+
+  function closeDayDialog() {
+    const dialog = document.getElementById("todoDayDialog");
+    if (dialog?.open) dialog.close();
+  }
+
   function init() {
-    hideDone = Store.get("site:todoHideDone:v2", true);
-    activeView = Store.get(VIEW_KEY, "list");
+    hideDone = Store.get(HIDE_DONE_KEY, true);
+    activeView = Store.get(MOBILE_VIEW_KEY, "calendar");
+    selectedDate = todayISO();
     ensureCalendarCursor();
+    if (!dateIsInVisibleRange(selectedDate)) selectedDate = isoFromDate(calendarCursor);
 
     const toggle = document.getElementById("toggleHideDone");
-
-    function syncToggleText() {
+    const syncToggleText = () => {
       if (!toggle) return;
       toggle.textContent = `Hide Done: ${hideDone ? "On" : "Off"}`;
-    }
+      toggle.setAttribute("aria-pressed", hideDone ? "true" : "false");
+    };
     syncToggleText();
-
     toggle?.addEventListener("click", () => {
       hideDone = !hideDone;
-      Store.set("site:todoHideDone:v2", hideDone);
+      Store.set(HIDE_DONE_KEY, hideDone);
       syncToggleText();
       renderAll();
     });
@@ -503,30 +672,64 @@ const TodoPageV2 = (() => {
     document.querySelectorAll(".seg__btn[data-list]").forEach(btn => {
       btn.addEventListener("click", () => setActiveList(btn.dataset.list));
     });
-
     document.querySelectorAll(".seg__btn[data-todo-view]").forEach(btn => {
       btn.addEventListener("click", () => setView(btn.dataset.todoView));
     });
 
-    document.getElementById("todoPrevMonth")?.addEventListener("click", () => shiftMonth(-1));
-    document.getElementById("todoNextMonth")?.addEventListener("click", () => shiftMonth(1));
-
-    document.getElementById("addTodoBtn")?.addEventListener("click", openComposer);
-    document.getElementById("todoSave")?.addEventListener("click", addTask);
-    document.getElementById("todoCancel")?.addEventListener("click", closeComposer);
-
-    document.getElementById("todoText")?.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") addTask();
-      if (e.key === "Escape") closeComposer();
+    document.getElementById("todoPrevWeek")?.addEventListener("click", () => shiftWeeks(-1));
+    document.getElementById("todoNextWeek")?.addEventListener("click", () => shiftWeeks(1));
+    document.getElementById("todoGoToday")?.addEventListener("click", goToCurrentWeek);
+    document.getElementById("todoToggleCalendarSpan")?.addEventListener("click", () => {
+      mobileShowTwoWeeks = !mobileShowTwoWeeks;
+      renderAll();
     });
 
-    // edit dialog bindings
+    document.getElementById("addTodoBtn")?.addEventListener("click", () => openComposer("", activeList));
+    document.getElementById("todoSave")?.addEventListener("click", addTask);
+    document.getElementById("todoCancel")?.addEventListener("click", closeComposer);
+    document.getElementById("todoText")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addTask();
+      } else if (event.key === "Escape") {
+        closeComposer();
+      }
+    });
+
     document.getElementById("todoEditSaveBtn")?.addEventListener("click", saveEdit);
     document.getElementById("todoEditDeleteBtn")?.addEventListener("click", deleteEdit);
+    document.getElementById("todoEditText")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveEdit();
+      }
+    });
+    document.getElementById("todoEditDue")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveEdit();
+      }
+    });
 
+    document.getElementById("todoDayAddBtn")?.addEventListener("click", () => {
+      const date = dayDialogDate;
+      closeDayDialog();
+      openComposer(date, "main");
+    });
     setActiveList("main");
-    renderAll();
     setView(activeView);
+    renderAll();
+
+    // Keep the date range and selected-day panel correct if the viewport crosses
+    // the desktop/mobile breakpoint while the page remains open.
+    let lastMobile = isMobileLayout();
+    window.addEventListener("resize", () => {
+      const nowMobile = isMobileLayout();
+      if (nowMobile !== lastMobile) {
+        lastMobile = nowMobile;
+        renderAll();
+      }
+    }, { passive: true });
   }
 
   return { init };

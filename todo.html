@@ -2,160 +2,197 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ToDo</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="page todo-plain bg-todo">
-
-  <header class="todo-topbar">
+  <header class="todo-topbar todo-topbar--workspace">
     <a class="todo-back" href="hub.html">← 返回</a>
 
-    <div class="todo-actions">
-      <button class="pill pill--light" id="toggleHideDone" type="button">Hide Done: On</button>
+    <div class="todo-actions todo-actions--workspace">
+      <button class="pill pill--light" id="toggleHideDone" type="button" aria-pressed="true">Hide Done: On</button>
 
-      <div class="seg" aria-label="todo list switcher">
-        <button class="seg__btn is-active" data-list="main" type="button">ToDo</button>
-        <button class="seg__btn" data-list="maybe" type="button">Maybe</button>
-        <button class="seg__btn" data-list="wish" type="button">Wish</button>
+      <div class="seg todo-category-switch" aria-label="Category for quick add">
+        <button class="seg__btn is-active" data-list="main" type="button" aria-pressed="true">ToDo</button>
+        <button class="seg__btn" data-list="maybe" type="button" aria-pressed="false">Maybe</button>
+        <button class="seg__btn" data-list="wish" type="button" aria-pressed="false">Wish</button>
       </div>
 
-      <div class="seg" aria-label="todo view switcher">
-        <button class="seg__btn is-active" data-todo-view="list" type="button">List</button>
-        <button class="seg__btn" data-todo-view="calendar" type="button">Calendar</button>
+      <div class="seg todo-mobile-view-toggle" aria-label="Mobile workspace view">
+        <button class="seg__btn is-active" data-todo-view="calendar" type="button" aria-pressed="true">Calendar</button>
+        <button class="seg__btn" data-todo-view="list" type="button" aria-pressed="false">List</button>
       </div>
 
-      <button class="btn btn--small" id="addTodoBtn" type="button">+ Add</button>
+      <button class="btn btn--small todo-add-button" id="addTodoBtn" type="button">+ Add</button>
     </div>
   </header>
 
-  <main class="wrap todo-wrap">
-
-    <!-- Section: Main To Do (with DDL) -->
-    <section class="todo-panel">
-      <div class="todo-panel__head">
-        <div class="todo-panel__title">ToDo</div>
-        <div class="todo-panel__sub">With DDL</div>
+  <main class="wrap todo-wrap todo-wrap--workspace">
+    <section class="todo-panel todo-main-panel" aria-label="ToDo">
+      <div class="todo-panel__head todo-main-panel__head">
+        <div>
+          <div class="todo-panel__title">ToDo</div>
+          <div class="todo-panel__sub">All tasks · Sorted by DDL</div>
+        </div>
       </div>
 
-      <div id="todoMainListView">
-        <div class="todo-table-head todo-table-head--actions">
-          <div class="todo-col todo-col--check">✓</div>
-          <div class="todo-col">Task</div>
-          <div class="todo-col todo-col--due">DDL</div>
-          <div class="todo-col todo-col--actions">Edit</div>
-        </div>
+      <div id="todoWorkspace" class="todo-workspace" data-mobile-view="calendar" aria-label="ToDo planning workspace">
+        <!-- Calendar and List are two views inside one ToDo section. -->
+        <section class="todo-panel todo-calendar-panel" aria-label="Calendar">
+          <div class="todo-calendar-wrap todo-calendar-wrap--workspace">
+            <div class="todo-calendar-toolbar todo-calendar-toolbar--workspace">
+              <div class="todo-week-nav">
+                <button class="mini-btn" id="todoPrevWeek" type="button" aria-label="Previous week range">← Prev</button>
+                <button class="mini-btn todo-today-button" id="todoGoToday" type="button">Today</button>
+                <button class="mini-btn" id="todoNextWeek" type="button" aria-label="Next week range">Next →</button>
+              </div>
+              <div class="todo-calendar-month" id="todoCalendarMonthLabel" aria-live="polite">Current week</div>
+              <button class="mini-btn todo-span-toggle" id="todoToggleCalendarSpan" type="button">Show 2 Weeks</button>
+            </div>
 
-        <div id="todoListMain" class="todo-list"></div>
-      </div>
+            <div class="todo-calendar-weekdays todo-calendar-weekdays--workspace" aria-hidden="true">
+              <div><span class="weekday-full">Monday</span><span class="weekday-short">M</span></div>
+              <div><span class="weekday-full">Tuesday</span><span class="weekday-short">T</span></div>
+              <div><span class="weekday-full">Wednesday</span><span class="weekday-short">W</span></div>
+              <div><span class="weekday-full">Thursday</span><span class="weekday-short">T</span></div>
+              <div><span class="weekday-full">Friday</span><span class="weekday-short">F</span></div>
+              <div><span class="weekday-full">Saturday</span><span class="weekday-short">S</span></div>
+              <div><span class="weekday-full">Sunday</span><span class="weekday-short">S</span></div>
+            </div>
 
-      <div id="todoMainCalendarView" class="todo-calendar-wrap hidden">
-        <div class="todo-calendar-toolbar">
-          <button class="mini-btn" id="todoPrevMonth" type="button">← Prev</button>
-          <div class="todo-calendar-month" id="todoCalendarMonthLabel">2026.03</div>
-          <button class="mini-btn" id="todoNextMonth" type="button">Next →</button>
-        </div>
+            <div id="todoCalendarGrid" class="todo-calendar-grid todo-calendar-grid--workspace"></div>
 
-        <div class="todo-calendar-weekdays" aria-hidden="true">
-          <div>Mon</div>
-          <div>Tue</div>
-          <div>Wed</div>
-          <div>Thu</div>
-          <div>Fri</div>
-          <div>Sat</div>
-          <div>Sun</div>
-        </div>
+            <section id="todoSelectedDayPanel" class="todo-selected-day-panel" aria-label="Selected day tasks">
+              <div class="todo-selected-day__head">
+                <div>
+                  <div class="todo-selected-day__eyebrow">Selected day</div>
+                  <h2 id="todoSelectedDayTitle" class="todo-selected-day__title">Today</h2>
+                </div>
+                <button id="todoSelectedDayAdd" class="btn btn--small" type="button">+ Add ToDo</button>
+              </div>
+              <div id="todoSelectedDayTasks" class="todo-selected-day__tasks"></div>
+            </section>
+          </div>
+        </section>
 
-        <div id="todoCalendarGrid" class="todo-calendar-grid"></div>
+        <section class="todo-panel todo-list-panel" aria-label="All ToDo tasks">
+          <div id="todoMainListView" class="todo-main-list-view">
+            <div class="todo-table-head todo-table-head--actions">
+              <div class="todo-col todo-col--check" aria-label="Complete">✓</div>
+              <div class="todo-col">Task</div>
+              <div class="todo-col todo-col--due">DDL</div>
+              <div class="todo-col todo-col--actions">Actions</div>
+            </div>
+            <div id="todoListMain" class="todo-list"></div>
+          </div>
+        </section>
       </div>
     </section>
 
-    <!-- Section: Maybe (no DDL) -->
-    <section class="todo-panel">
-      <div class="todo-panel__head">
-        <div class="todo-panel__title">Maybe</div>
-        <div class="todo-panel__sub">No DDL</div>
-      </div>
-
-      <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
-        <div class="todo-col todo-col--check">✓</div>
-        <div class="todo-col">Task</div>
-        <div class="todo-col todo-col--actions">Edit</div>
-      </div>
-
-      <div id="todoListMaybe" class="todo-list todo-list--nodue"></div>
-    </section>
-
-    <!-- Section: Wish (no DDL) -->
-    <section class="todo-panel">
-      <div class="todo-panel__head">
-        <div class="todo-panel__title">Wish</div>
-        <div class="todo-panel__sub">No DDL</div>
-      </div>
-
-      <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
-        <div class="todo-col todo-col--check">✓</div>
-        <div class="todo-col">Item</div>
-        <div class="todo-col todo-col--actions">Edit</div>
-      </div>
-
-      <div id="todoListWish" class="todo-list todo-list--nodue"></div>
-    </section>
-
-    <!-- Composer -->
-    <section id="todoComposer" class="composer composer--new hidden" aria-label="Add a task">
-      <div class="composer__row">
-        <input id="todoText" class="input" type="text" placeholder="Type A Task…" maxlength="140">
-        <input id="todoDue" class="input input--due" type="date">
-      </div>
-
-      <div class="composer__row composer__row--actions">
-        <span class="composer__hint" id="composerHint">Adding To: To Do (With DDL)</span>
-        <div class="composer__btns">
-          <button id="todoSave" class="btn btn--small" type="button">Save</button>
-          <button id="todoCancel" class="btn btn--small btn--ghost" type="button">Cancel</button>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Edit Dialog -->
-  <dialog id="todoEditDialog" class="dialog">
-    <form method="dialog" class="dialog__panel">
-      <h2 class="title" style="margin:0 0 10px;">Edit Task</h2>
-
-      <div style="display:grid; gap:10px;">
-        <input id="todoEditText" class="input" type="text" placeholder="Task…" maxlength="140">
-        <input id="todoEditDue" class="input" type="date">
-
-        <label style="display:flex; align-items:center; gap:10px; font-size:13px; color:rgba(15,17,21,.9);">
-          <input id="todoEditDone" type="checkbox" />
-          Mark as done
-        </label>
-
-        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-          <div class="hint" id="todoEditHint" style="margin:0;">You can edit / delete anytime.</div>
-
-          <div style="display:flex; gap:10px;">
-            <button id="todoEditDeleteBtn" class="btn btn--ghost btn--small" value="cancel" type="button">Delete</button>
-            <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
-            <button id="todoEditSaveBtn" class="btn btn--small" value="default" type="button">Save</button>
+    <!-- Maybe and Wish keep their original independent lists and no-date workflow. -->
+    <section class="todo-secondary-lists" aria-label="Maybe and Wish">
+      <section class="todo-panel todo-secondary-panel">
+        <div class="todo-panel__head">
+          <div>
+            <div class="todo-panel__title">Maybe</div>
+            <div class="todo-panel__sub">No DDL</div>
           </div>
         </div>
+        <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
+          <div class="todo-col todo-col--check" aria-label="Complete">✓</div>
+          <div class="todo-col">Task</div>
+          <div class="todo-col todo-col--actions">Actions</div>
+        </div>
+        <div id="todoListMaybe" class="todo-list todo-list--nodue"></div>
+      </section>
+
+      <section class="todo-panel todo-secondary-panel">
+        <div class="todo-panel__head">
+          <div>
+            <div class="todo-panel__title">Wish</div>
+            <div class="todo-panel__sub">No DDL</div>
+          </div>
+        </div>
+        <div class="todo-table-head todo-table-head--nodue todo-table-head--actions">
+          <div class="todo-col todo-col--check" aria-label="Complete">✓</div>
+          <div class="todo-col">Item</div>
+          <div class="todo-col todo-col--actions">Actions</div>
+        </div>
+        <div id="todoListWish" class="todo-list todo-list--nodue"></div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Quick add: DDL is optional unless a Calendar date was clicked. -->
+  <dialog id="todoCreateDialog" class="dialog todo-compose-dialog">
+    <form method="dialog" class="dialog__panel todo-dialog-panel">
+      <div class="todo-dialog-heading">
+        <h2 class="title" id="todoCreateTitle">Add ToDo</h2>
+        <p id="composerHint" class="sub">ToDo · DDL is optional</p>
+      </div>
+      <label class="todo-dialog-field">
+        <span>Task name</span>
+        <input id="todoText" class="input" type="text" placeholder="Type a task…" maxlength="140" autocomplete="off" required />
+      </label>
+      <label class="todo-dialog-field" id="todoDueField">
+        <span>DDL <span class="todo-optional-label">(optional)</span></span>
+        <input id="todoDue" class="input" type="date" />
+      </label>
+      <div class="todo-dialog-actions">
+        <button id="todoCancel" class="btn btn--small btn--ghost" type="button">Cancel</button>
+        <button id="todoSave" class="btn btn--small" type="button">Save</button>
+      </div>
+      <p class="hint todo-enter-hint">Press Enter to save.</p>
+    </form>
+  </dialog>
+
+  <!-- Edit existing tasks, including clearing an optional DDL. -->
+  <dialog id="todoEditDialog" class="dialog todo-edit-dialog">
+    <form method="dialog" class="dialog__panel todo-dialog-panel">
+      <h2 class="title todo-edit-title">Edit Task</h2>
+      <label class="todo-dialog-field">
+        <span>Task name</span>
+        <input id="todoEditText" class="input" type="text" placeholder="Task…" maxlength="140" required />
+      </label>
+      <label class="todo-dialog-field" id="todoEditDueField">
+        <span>DDL <span class="todo-optional-label">(optional)</span></span>
+        <input id="todoEditDue" class="input" type="date" />
+      </label>
+      <label class="todo-done-field">
+        <input id="todoEditDone" type="checkbox" />
+        Mark as done
+      </label>
+      <div class="todo-dialog-actions todo-dialog-actions--edit">
+        <button id="todoEditDeleteBtn" class="btn btn--ghost btn--small todo-delete-button" type="button">Delete</button>
+        <span class="todo-dialog-actions__spacer"></span>
+        <button class="btn btn--ghost btn--small" value="cancel" type="submit">Cancel</button>
+        <button id="todoEditSaveBtn" class="btn btn--small" type="button">Save</button>
+      </div>
+      <p id="todoEditHint" class="hint">You can edit or delete this task anytime.</p>
+    </form>
+  </dialog>
+
+  <!-- Full list for dates with more tasks than the compact Calendar can show. -->
+  <dialog id="todoDayDialog" class="dialog todo-day-dialog">
+    <form method="dialog" class="dialog__panel todo-dialog-panel">
+      <h2 id="todoDayDialogTitle" class="title">Day tasks</h2>
+      <div id="todoDayDialogTasks" class="todo-day-dialog__tasks"></div>
+      <div class="todo-dialog-actions">
+        <button id="todoDayAddBtn" class="btn btn--small" type="button">+ Add ToDo</button>
+        <button class="btn btn--ghost btn--small" value="cancel" type="submit">Close</button>
       </div>
     </form>
   </dialog>
 
   <script src="app.js"></script>
   <script>
-    TodoPageV2.init();
-</script>
+    if (window.TodoPageV2?.init) window.TodoPageV2.init();
+  </script>
 </body>
 </html>
