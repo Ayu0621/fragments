@@ -1,0 +1,10 @@
+my-site/
+  index.html
+  hub.html
+  todo.html
+  inspo.html
+  style.css
+  app.js
+  assets/
+    bg-home.jpg
+    bg-hub.jpg

@@ -42,16 +42,19 @@
         </form>
       </dialog>
 
-      <p class="hint">Tip: This is stored only in your browser.</p>
+      <p class="hint">Tip: v6.0 can sync your data across devices once Cloud is connected.</p>
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="cloud-config.js"></script>
+  <script src="cloud.js"></script>
   <script src="app.js"></script>
   <script>
     // lyric quick edit (local-only)
     const key = "site:lyric";
     const el = document.getElementById("lyricText");
-    const saved = localStorage.getItem(key);
+    const saved = Store.get(key, null);
     if (saved) el.textContent = saved;
 
     document.getElementById("homeInboxAddBtn")?.addEventListener("click", () => document.getElementById("homeInboxDialog")?.showModal());
@@ -62,7 +65,7 @@
       if (next && next.trim()) {
         const wrapped = `“${next.trim()}”`;
         el.textContent = wrapped;
-        localStorage.setItem(key, wrapped);
+        Store.set(key, wrapped);
       }
     });
 
