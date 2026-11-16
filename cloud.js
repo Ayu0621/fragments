@@ -164,8 +164,27 @@
   async function boot() {
     if (!configured() || !window.supabase?.createClient) { renderCloudUI(); return; }
     client = window.supabase.createClient(window.FRAGMENTS_SUPABASE_URL, window.FRAGMENTS_SUPABASE_ANON_KEY);
-    await startSession();
-    client.auth.onAuthStateChange((_event, session) => { user = session?.user || null; renderCloudUI(); });
+
+    // Register the listener before reading the session. Supabase emits
+    // INITIAL_SESSION after subscription; do not rebuild the panel when the
+    // user has not actually changed, otherwise it resets Synced ✓ to Checking….
+    client.auth.onAuthStateChange((event, session) => {
+      const nextUser = session?.user || null;
+      const currentId = user?.id || null;
+      const nextId = nextUser?.id || null;
+      if (nextId !== currentId) {
+        user = nextUser;
+        renderCloudUI();
+        if (!nextUser) setStatus('Local mode');
+      }
+    });
+
+    try {
+      await startSession();
+    } catch (e) {
+      console.error('Fragments Cloud initialization failed', e);
+      setStatus('Sync failed — ' + (e?.message || 'check connection'), 'warn');
+    }
   }
 
   window.FragmentsCloud = { boot, pushAll, queuePush, login, logout };
