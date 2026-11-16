@@ -1,3 +1,12 @@
+
+@font-face{
+  font-family:"GenRyuMin TW";
+  src:url("https://cdn.jsdelivr.net/gh/ButTaiwan/genryu-font@master/otf/TW/GenRyuMin2TW-R.otf") format("opentype");
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+}
+
 :root{
   --bg:#0b0b0c;
   --paper:#ffffff;
@@ -8,8 +17,8 @@
   /* Accent: Denim Blue */
   --btn:#111111;
 
-  --font-ui: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Noto Sans CJK SC", sans-serif;
-  --font-display: "Playfair Display", Georgia, "Songti SC", serif;
+  --font-ui: "Cormorant", "GenRyuMin TW", "Noto Serif TC", "Songti TC", serif;
+  --font-display: "Cormorant", "GenRyuMin TW", Georgia, "Songti TC", serif;
 
   --shadow: 0 10px 30px rgba(0,0,0,.25);
 }
@@ -3293,5 +3302,87 @@ body{
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
+  }
+}
+
+
+/* =========================
+   FRAGMENTS v7.0 — TYPOGRAPHY
+   English: Cormorant | Chinese: GenRyuMin TW
+   Unified responsive type scale; existing layout and components retained.
+   ========================= */
+:root{
+  --font-en: "Cormorant", Georgia, serif;
+  --font-zh: "GenRyuMin TW", "Noto Serif TC", "Songti TC", serif;
+  --font-ui: "Cormorant", "GenRyuMin TW", "Noto Serif TC", "Songti TC", serif;
+  --font-display: "Cormorant", "GenRyuMin TW", Georgia, "Songti TC", serif;
+
+  --type-page: 34px;
+  --type-section: 24px;
+  --type-subheading: 18px;
+  --type-body: 15px;
+  --type-caption: 13px;
+  --type-label: 11px;
+}
+html, body, button, input, select, textarea{
+  font-family: var(--font-ui);
+}
+body{ font-size: var(--type-body); }
+h1, .lyric{
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.2vw, 44px);
+  line-height: 1.15;
+}
+h2, .title{
+  font-family: var(--font-display);
+  font-size: var(--type-section);
+  line-height: 1.2;
+}
+h3{ font-family: var(--font-display); font-size: var(--type-subheading); line-height: 1.25; }
+p, li, label, .sub{ font-size: var(--type-body); }
+.hint, small, .caption{ font-size: var(--type-caption); }
+button, .btn{ font-family: var(--font-en), var(--font-zh), serif; }
+
+@media (max-width: 640px){
+  :root{
+    --type-page: 28px;
+    --type-section: 21px;
+    --type-subheading: 17px;
+    --type-body: 15px;
+    --type-caption: 13px;
+    --type-label: 11px;
+  }
+  h2, .title{ font-size: var(--type-section); }
+  h3{ font-size: var(--type-subheading); }
+}
+
+
+/* =========================================================
+   FRAGMENTS v7.0 FIX — CONSISTENT TASK TEXT (ORIGINAL SCALE)
+   Preserve the original 14px desktop / 13px mobile sizing,
+   while making every task label use the same rules.
+   ========================================================= */
+.todo-row .todo-text,
+.todo-row .todo-text-button,
+.todo-list-panel .todo-row .todo-text,
+.todo-list-panel .todo-row .todo-text-button,
+.todo-secondary-panel .todo-row .todo-text,
+.todo-secondary-panel .todo-row .todo-text-button {
+  font-family: var(--font-ui) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  letter-spacing: normal !important;
+}
+
+@media (max-width: 640px) {
+  .todo-row .todo-text,
+  .todo-row .todo-text-button,
+  .todo-list-panel .todo-row .todo-text,
+  .todo-list-panel .todo-row .todo-text-button,
+  .todo-secondary-panel .todo-row .todo-text,
+  .todo-secondary-panel .todo-row .todo-text-button {
+    font-size: 13px !important;
+    line-height: 1.35 !important;
   }
 }
