@@ -9,7 +9,10 @@ const Store = {
     }
   },
   set(key, value) {
+    // Persist locally first; cloud upload is queued separately and never
+    // blocks the UI or the local save.
     localStorage.setItem(key, JSON.stringify(value));
+    window.FragmentsCloud?.queuePush?.(key);
   },
   uid() {
     return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);

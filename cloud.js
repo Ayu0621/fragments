@@ -3,7 +3,8 @@
   const TABLE = 'site_sync';
   const META_KEY = 'site:cloudSyncMeta:v1';
   const IGNORE = new Set([META_KEY]);
-  let client = null, user = null, syncing = false, started = false;
+  let client = null, user = null, syncing = false;
+  const pushTimers = new Map();
 
   const state = () => {
     try { return JSON.parse(localStorage.getItem(META_KEY) || '{}'); } catch { return {}; }
@@ -70,20 +71,25 @@
     }
   }
 
-  function installStoreHook() {
-    const originalSetItem = localStorage.setItem.bind(localStorage);
-    // Store.set calls this synchronously; cloud upload is deliberately async.
-    localStorage.setItem = function(key, value) {
-      originalSetItem(key, value);
-      if (!syncing && user && key.startsWith('site:') && !IGNORE.has(key)) {
-        setStatus('Saving…');
-        clearTimeout(window.__fragmentsCloudTimer);
-        window.__fragmentsCloudTimer = setTimeout(async () => {
-          try { await pushKey(key); setStatus('Synced ✓', 'ok'); }
-          catch (e) { console.error('Cloud sync failed', e); setStatus('Offline / retry later', 'warn'); }
-        }, 350);
+  // Called explicitly by Store.set() after a successful local write.
+  // This avoids relying on monkey-patching the browser's Storage object,
+  // which is not a dependable interception point across mobile browsers.
+  function queuePush(key) {
+    if (syncing || !user || !client || !key?.startsWith('site:') || IGNORE.has(key)) return;
+    setStatus('Saving…');
+    const oldTimer = pushTimers.get(key);
+    if (oldTimer) clearTimeout(oldTimer);
+    const timer = setTimeout(async () => {
+      pushTimers.delete(key);
+      try {
+        await pushKey(key);
+        setStatus('Synced ✓', 'ok');
+      } catch (e) {
+        console.error('Cloud sync failed for ' + key, e);
+        setStatus('Sync failed — retry later', 'warn');
       }
-    };
+    }, 350);
+    pushTimers.set(key, timer);
   }
 
   async function login(email, password, mode='login') {
@@ -131,7 +137,7 @@
     panel.id = 'cloudSyncPanel';
     panel.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:99999;font:12px Inter,system-ui,sans-serif;background:rgba(20,20,20,.88);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 12px;backdrop-filter:blur(10px);max-width:min(320px,calc(100vw - 28px))';
     if (user) {
-      panel.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><span id="cloudSyncStatus">Synced ✓</span><button id="cloudLogout" style="margin-left:auto;background:none;border:0;color:#ddd;cursor:pointer">Sign out</button></div><div style="opacity:.6;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">☁ ${user.email || 'Cloud account'}</div>`;
+      panel.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><span id="cloudSyncStatus">Checking…</span><button id="cloudLogout" style="margin-left:auto;background:none;border:0;color:#ddd;cursor:pointer">Sign out</button></div><div style="opacity:.6;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">☁ ${user.email || 'Cloud account'}</div>`;
       document.body.appendChild(panel);
       panel.querySelector('#cloudLogout').onclick = logout;
     } else {
@@ -156,13 +162,12 @@
   }
 
   async function boot() {
-    installStoreHook();
     if (!configured() || !window.supabase?.createClient) { renderCloudUI(); return; }
     client = window.supabase.createClient(window.FRAGMENTS_SUPABASE_URL, window.FRAGMENTS_SUPABASE_ANON_KEY);
     await startSession();
     client.auth.onAuthStateChange((_event, session) => { user = session?.user || null; renderCloudUI(); });
   }
 
-  window.FragmentsCloud = { boot, pushAll, login, logout };
+  window.FragmentsCloud = { boot, pushAll, queuePush, login, logout };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true }); else boot();
 })();
