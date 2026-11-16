@@ -1,11 +1,11 @@
-
 @font-face{
-  font-family:"GenRyuMin TW";
-  src:url("https://cdn.jsdelivr.net/gh/ButTaiwan/genryu-font@master/otf/TW/GenRyuMin2TW-R.otf") format("opentype");
-  font-style:normal;
-  font-weight:400;
-  font-display:swap;
+  font-family: "GenRyuMin TW";
+  src: url("./fonts/GenRyuMin2TW-R.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
+
 
 :root{
   --bg:#0b0b0c;
@@ -3388,17 +3388,8 @@ button, .btn{ font-family: var(--font-en), var(--font-zh), serif; }
 }
 
 
-/* FRAGMENTS v7.0.1 — explicit CJK typography for the Index page.
-   Cormorant remains the Latin/number face; GenRyuMin TW is explicitly
-   assigned to the Chinese UI elements so mobile browsers do not rely
-   only on automatic per-glyph fallback. */
-body.bg-hub .title,
-body.bg-hub .sub,
-body.bg-hub .hub-card,
-body.bg-hub .btn {
-  font-family: "GenRyuMin TW", "Noto Serif TC", "Songti TC", serif !important;
-  font-weight: 400;
-}
-body.bg-hub .hint {
-  font-family: "Cormorant", "GenRyuMin TW", "Noto Serif TC", serif;
+/* v7.0 local CJK font: use GenRyuMin TW for Han characters,
+   while Cormorant remains the preferred Latin/number typeface. */
+:lang(zh), :lang(zh-Hant), :lang(zh-TW), :lang(zh-HK) {
+  font-family: "Cormorant", "GenRyuMin TW", "Noto Serif TC", "Songti TC", serif;
 }

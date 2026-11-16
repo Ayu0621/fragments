@@ -36,12 +36,11 @@ same font family, weight and line-height. This changes CSS only; app logic,
 data and cloud-sync files remain unchanged.
 
 
-V7.0.1 INDEX CJK FONT FIX
-------------------------
-- Corrected GenRyuMin TW @font-face to static weight 400 (the source OTF is
-  a regular static face, not a variable 100-900 font).
-- Explicitly applied GenRyuMin TW to the Chinese title, subtitle, cards and
-  return button on hub.html.
-- Added a font preload on hub.html and a stylesheet cache-busting query.
-- Preserved Cormorant for the English hint text.
-- No application JavaScript, task data, layout logic or cloud-sync code changed.
+V7.0 FIXED-V4 — SELF-HOSTED CHINESE FONT
+---------------------------------------
+GenRyuMin2TW-R.otf is bundled locally at ./fonts/GenRyuMin2TW-R.otf.
+The @font-face now uses a same-origin relative URL, with font-weight: 400.
+HTML pages preload the local font to reduce first-render fallback on mobile.
+Cormorant remains the English/Latin font; GenRyuMin TW is the Chinese glyph
+fallback. No external CDN is required for GenRyuMin TW.
+Task typography remains 14px desktop / 13px mobile.
