@@ -34,3 +34,14 @@ Restored the original task-label scale instead of the temporary 16px size:
 14px desktop and 13px mobile. ToDo, Maybe and Wish task labels share the
 same font family, weight and line-height. This changes CSS only; app logic,
 data and cloud-sync files remain unchanged.
+
+
+V7.0.1 INDEX CJK FONT FIX
+------------------------
+- Corrected GenRyuMin TW @font-face to static weight 400 (the source OTF is
+  a regular static face, not a variable 100-900 font).
+- Explicitly applied GenRyuMin TW to the Chinese title, subtitle, cards and
+  return button on hub.html.
+- Added a font preload on hub.html and a stylesheet cache-busting query.
+- Preserved Cormorant for the English hint text.
+- No application JavaScript, task data, layout logic or cloud-sync code changed.
